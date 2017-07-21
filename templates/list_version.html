@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">版本查看</li>
+    </ol>
+    <a href="{% url 'add_version' %}" class="btn btn-success">添加</a>
+    <div>
+        <table class="table">
+            <caption>iOS版本列表</caption>
+            <thead>
+                <tr>
+                    <th>版本code</th>
+                    <th>版本名称</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for version in ios_versions %}
+                    <tr>
+                        <td>{{ version.code }}</td>
+                        <td>{{ version.name }}</td>
+                        <td>
+                            <a href="/xbase/delete_version/{{ version.oid }}" class="btn btn-danger">删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table class="table">
+            <caption>android版本列表</caption>
+            <thead>
+                <tr>
+                    <th>版本code</th>
+                    <th>版本名称</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for version in android_versions %}
+                    <tr>
+                        <td>{{ version.code }}</td>
+                        <td>{{ version.name }}</td>
+                        <td>
+                            <a href="/xbase/delete_version/{{ version.oid }}" class="btn btn-danger">删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

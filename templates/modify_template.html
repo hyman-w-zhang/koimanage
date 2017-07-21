@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li><a href="{% url 'list_template' %}">模板管理</a></li>
+        <li class="active">添加模板</li>
+    </ol>
+    <form action="{% url 'save_modify_template' %}" role="form" method="post" enctype="multipart/form-data" data-toggle="validator">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>资源文件：</label>
+            <input id="material" name="material" type="file" class="form-leo" accept="application/zip" required>
+        </div>
+        <div class="form-group">
+            <label>ID：</label>
+            <input type="text" id="id" name="id" class="form-control add-clear" maxlength="128" pattern="^[a-zA-Z0-9\-_]+$" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" value="{{ id }}"
+                   required>
+        </div>
+        <div class="form-group">
+            <label>标题：</label>
+            <input type="text" id="title" name="title" class="form-control add-clear" maxlength="128" required value="{{ title }}">
+        </div>
+        <div class="form-group">
+            <label>视频文件：</label>
+            <input id="video" name="video" type="file" class="form-leo" accept="video/mp4">
+        </div>
+        <div class="form-group">
+            <label>缩略图：</label>
+            <input id="thumb" name="thumb" type="file" class="form-leo" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>封面：</label>
+            <input id="poster" name="poster" type="file" class="form-leo" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>描述：</label>
+            <input type="text" id="description" name="description" class="form-control add-clear" maxlength="128" value="{{ description }}"required>
+        </div>
+        <div class="form-group">
+            <label>类型：</label>
+            <input type="text" id="tags" name="tags" class="form-control add-clear" maxlength="128" required value="{{ tags }}">
+        </div>
+        <div class="form-group">
+            <label>原价：</label>
+            <input type="text" id="origin_price" name="origin_price" class="form-control add-clear" required pattern="^\d+(\.\d{1, 2})?$" value="{{ origin_price }}">
+        </div>
+        <div class="form-group">
+            <label>促销价格：</label>
+            <input type="text" id="on_sale_price" name="on_sale_price" class="form-control add-clear" required pattern="^\d+(\.\d{1, 2})?$" value="{{ on_sale_price }}">
+        </div>
+
+        <div class="center">
+            <button type="submit" class="btn btn-default">提交</button>
+        </div>
+    </form>
+
+{% endblock %}

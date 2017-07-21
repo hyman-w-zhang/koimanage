@@ -1,0 +1,9 @@
+*.pyc
+db.sqlite3
+deploy/
+.idea/
+wcbp
+template/__pycache__/
+koimanage/__pycache__/
+work/__pycache__/
+utils/__pycache__/

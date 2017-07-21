@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+        <meta name="description" content="leomaster, xbase, postto">
+        <meta name="author" content="ss@leomaster.com">
+        <link rel="icon" href="data:image/gif;base64,R0mdODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+
+        <title>Koi Managing System</title>
+
+        <!-- Custom styles for this template -->
+        {# Load the tag library #}
+        {% load bootstrap3 %}
+
+        {# Load CSS and JavaScript #}
+        {% bootstrap_css %}
+        {% bootstrap_javascript jquery=1 %}
+
+        {% load staticfiles %}
+
+        <link href="{% static 'css/dashboard.css' %}" rel="stylesheet" />
+        <link href="{% static 'css/bootstrap-multiselect.css' %}" rel="stylesheet">
+        <script src="{% static 'js/bootstrap-multiselect.js' %}" ></script>
+        <link href="{% static 'css/bootstrap-datetimepicker.min.css' %}" rel="stylesheet">
+        <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}" ></script>
+        <script src="{% static 'js/bootstrap-add-clear.min-1.0.7.js' %}" ></script>
+        <link href="{% static 'css/bootstrap-select.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/jquery.tagsinput.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet">
+        <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+        <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+        <script src="{% static 'js/validator.min.js' %}"></script>
+        <script src="{% static 'js/jquery.tagsinput.min.js' %}"></script>
+        <script src="{% static 'js/jquery-cloneya.min.js' %}"></script>
+
+        <style>
+            /* 修改导航样式*/
+            .sidebar .panel-group .panel {
+                margin:0;
+                border-top:0;
+                border-right: 0;
+            }
+             /* 修改导航样式*/
+            .sidebar .panel-body{
+                padding:10px 15px;
+                font-size:12px;
+            }
+            .sidebar .panel-default>.panel-heading+.panel-collapse>.panel-body ,.sidebar .panel-default {
+                border-color: #f3f3f3 !important;
+                border-radius: 0;
+            }
+            .sideba a:hover {
+                text-decoration: none; cursor:pointer;
+            }
+            .ripple {
+                position:relative; overflow:hidden; color:#337ab7;
+            }
+            .ripple:after {
+                content: ""; background: rgba(130,130,130,0.3); display:block; position:absolute; border-radius:50%; padding-top:240%;padding-left:240%;
+                margin-top: -120%; margin-left:-120%;opacity:0;transition:all 1s;
+            }
+            .ripple:active:after {
+                padding-top:0; padding-left:0; margin-top:0; margin-left:0; opacity:1; transition:0s;
+            }
+            .navbar-header .form-group {
+                margin-bottom:0;
+            }
+            .loading-modal {
+                display: none; position: fixed; z-index: 1000; top: 0; left: 0; height: 100%; width: 100%;
+                background: rgba( 224, 224, 224, .8 ) url('/static/images/loading.gif') 50% 50% no-repeat;
+            }
+            body.loading {
+                overflow: hidden;
+            }
+            body.loading .loading-modal {
+                display: block;
+            }
+            .center {
+                width: auto; display: table; margin-left: auto; margin-right: auto;
+            }
+            .form-leo {
+                padding: 4px; border-radius: 4px; height: 34px;
+            }
+            td.image img, td.image video {
+                max-height: 128px; min-height:128px;
+            }
+            .table>tbody>tr>td {
+                vertical-align: middle;
+            }
+
+        </style>
+
+        <script type="text/javascript">
+            $(function () {
+                $.ajaxSetup({
+                    'headers': { "X-CSRFToken": getCookie("csrftoken") }
+                });
+            });
+            function getCookie(c_name) {
+                if (document.cookie.length > 0) {
+                    c_start = document.cookie.indexOf(c_name + "=");
+                    if (c_start != -1) {
+                        c_start = c_start + c_name.length + 1;
+                        c_end = document.cookie.indexOf(";", c_start);
+                        if (c_end == -1) c_end = document.cookie.length;
+                        return unescape(document.cookie.substring(c_start,c_end));
+                    }
+                }
+                return "";
+             }
+            $(document).on({
+                ajaxStart: function(){
+                    $("body").addClass("loading");
+                },
+                ajaxStop: function(){
+                    $("body").removeClass("loading");
+                }
+            });
+        </script>
+
+        <script type="text/javascript">
+            function padding_zero(d, length) {
+                var str = '' + d;
+                for (var i = 0; i < length - str.length; i++) {
+                    str = '0' + str;
+                }
+                return str;
+            }
+            function get_standard_datetime_string(ts) {
+                var dt = (ts == undefined ? new Date() : new Date(ts * 1000));
+                var str = padding_zero(dt.getFullYear(), 4) + '-' + padding_zero(dt.getMonth() + 1, 2) + '-' + padding_zero(dt.getDate(), 2)
+                        + ' ' + padding_zero(dt.getHours(), 2) + ':' + padding_zero(dt.getMinutes(), 2) + ':' + padding_zero(dt.getSeconds(), 2);
+                return str;
+            }
+        </script>
+
+        <!-- Custom javascript -->
+        {% block 'custom_js' %}
+        {% endblock %}
+
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top" style="background-color: #444">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#" style="color: #fff;font-weight: bold;" >Koi Admin</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar" style="padding:0">
+                    {% block 'sidebar' %}
+                    {% include 'left_sidebar.html' %}
+                    {% endblock %}
+                </div>
+                <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                    {% block 'content' %}
+                        <ol class="breadcrumb">
+                            <li class="active">欢迎进入锦鲤商拍运营管理系统</li>
+                        </ol>
+                        <div><hr/></div>
+                        <div class="container">
+                            <label>系统管理</label>
+                            <div class="row" id="system">
+                                <div class="col-md-2">
+                                    <p><a class="btn btn-md btn-danger" href="/admin">账号管理</a></p>
+                                </div>
+                                <div class="offset-md-1 col-md-2">
+                                    <p><a class="btn btn-md btn-danger" href="/admin/password_change">修改密码</a></p>
+                                </div>
+                                <div class="offset-md-1 col-md-2">
+                                    <p><a class="btn btn-md btn-danger" href="/admin/logout">退出登录</a></p>
+                                </div>
+                            </div>
+
+                            <div><hr/></div>
+
+                            <div id="works">
+                                <label>作品管理</label>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <p><a class="btn btn-md btn-info" href="{% url 'list_works' %}">作品查看</a></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="templates">
+                                <label>模板管理</label>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <p><a class="btn btn-md btn-info" href="{% url 'list_template' %}">查看模板</a></p>
+                                    </div>
+                                    <div class="offset-md-1 col-md-2">
+                                        <p><a class="btn btn-md btn-info" href="{% url 'add_template' %}">添加模板</a></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div><hr/></div>
+
+                        </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $('input[type=file]').bind('change', function(){
+                var files = this.files;
+                var maxlength = $(this).attr('maxlength') || 104857600;
+                if (files.length > 0) {
+                    if (files[0].size > maxlength) {
+                        alert('上传的素材文件大小超过 ' + (maxlength / 1024 / 1024).toFixed(1) + ' MB！');
+                    }
+                    $(this).next().replaceWith('<span>文件大小: <strong>' + (files[0].size / 1024 / 1024).toFixed(2) + 'MB</strong></span>');
+                }
+            });
+        </script>
+
+        <!-- loading modal -->
+        <div class="loading-modal"></div>
+    </body>
+
+    <script>
+        $(function(){
+            $("input.add-clear").addClear();
+        });
+    </script>
+
+</html>

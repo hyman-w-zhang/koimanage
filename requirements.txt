@@ -1,0 +1,11 @@
+django==1.11.3
+pytz==2017.2
+pymongo==3.4.0
+Pillow==4.1.1
+pymediainfo==2.1.9
+Jinja2==2.8
+requests==2.16.0
+httplib2==0.10.3
+redis==2.10.5
+mongoalchemy==0.21
+django-bootstrap3==9.0.0

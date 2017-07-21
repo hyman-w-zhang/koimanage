@@ -1,0 +1,46 @@
+<div style="float: left; position: absolute;width: 100%;">
+
+    <div class="panel-group" id="accordion1">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_works">作品管理</a>
+                </h4>
+            </div>
+            <div id="collapse_works" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_works' %}">
+                   查看作品
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_templates">模板管理</a>
+                </h4>
+            </div>
+            <div id="collapse_templates" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_template' %}">
+                   查看模板
+                </div>
+                <div class="accordion-inner panel-body ripple" href="{% url 'add_template' %}">
+                   添加模板
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+<script type="text/javascript">
+        $(document).ready(function(){
+            $(".sidebar .ripple").click(function(){
+                var self = $(this);
+                setTimeout(function(){
+                   window.location.href=self.attr("href");
+                }, 100);
+            });
+        });
+      </script>
