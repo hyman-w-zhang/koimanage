@@ -29,4 +29,11 @@ urlpatterns = [
     url(r'^version/list', view=views.retrieve_versions, name='list_version'),
     url(r'^version/save', view=views.save_version, name='save_version'),
     url(r'^version/delete/([\w\-]+)', view=views.delete_version, name='delete_version'),
+
+    url(r'^api_config/add', view=views.add_api_config, name='add_api_config'),
+    url(r'^api_config/list', view=views.retrieve_api_configs, name='list_api_config'),
+    url(r'^api_config/save$', view=views.save_api_config, name='save_api_config'),
+    url(r'^api_config/save_modified', view=views.save_modified_api_config, name='save_modified_api_config'),
+    url(r'^api_config/modify/([\w\-]+)', view=views.modify_api_config, name='modify_api_config'),
+    url(r'^api_config/delete/([\w\-]+)', view=views.delete_api_config, name='delete_api_config'),
 ]

@@ -16,7 +16,7 @@
         <div class="form-group">
             <label>ID：</label>
             <input type="text" id="id" name="id" class="form-control add-clear" maxlength="128" pattern="^[a-zA-Z0-9\-_]+$" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
-                   value="{{ id }}"required>
+                   value="{{ id }}" required>
         </div>
         <div class="form-group">
             <label>标题：</label>
@@ -27,11 +27,11 @@
             <input id="video" name="video" type="file" class="form-leo" accept="video/mp4" required>
         </div>
         <div class="form-group">
-            <label>缩略图：</label>
+            <label>动态封面：</label>
             <input id="thumb" name="thumb" type="file" class="form-leo" accept="image/*" required>
         </div>
         <div class="form-group">
-            <label>封面：</label>
+            <label>缩略图：</label>
             <input id="poster" name="poster" type="file" class="form-leo" accept="image/*" required>
         </div>
         <div class="form-group">
@@ -49,6 +49,31 @@
         <div class="form-group">
             <label>促销价格：</label>
             <input type="text" id="on_sale_price" name="on_sale_price" class="form-control add-clear" value="0" required pattern="^\d+(\.\d{1,2})?$">
+        </div>
+
+        <div class="form-group">
+            <label>版本要求(特殊说明:如果选了两个"暂不支持"就可以获得一个"敬请期待")</label>
+            <div class="input-group">
+                <span class="input-group-addon">iOS:</span>
+                <select id="ios_version" name="ios_version" class="select form-control">
+                    {% for ios_version in ios_versions %}
+                        <option value="{{ ios_version.code }}">{{ ios_version.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">android:</span>
+                <select id="android_version" name="android_version" class="select form-control">
+                    {% for android_version in android_versions %}
+                        <option value="{{ android_version.code }}">{{ android_version.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>appstore商品id：</label>
+            <input type="text" id="appstore_merchant_id" name="appstore_merchant_id" class="form-control add-clear">
         </div>
 
         <div class="center">

@@ -6,11 +6,15 @@ from django.shortcuts import render
 from utils import upload_material_file
 from wcbp.model.template import Templates
 
+from koimanage import versions
+
+import time
+
 
 @login_required
 def add_template(request):
     id = str(ObjectId())
-    return render(request, 'add_template.html', {'id': id})
+    return render(request, 'add_template.html', {'id': id, 'ios_versions': versions.retrieve_ios_versions(), 'android_versions': versions.retrieve_android_versions()})
 
 
 @login_required
@@ -21,7 +25,7 @@ def save_template(request):
     tags = request.POST['tags'].split(';')
 
     material = request.FILES.get('material')
-    material_file_name = upload_material_file.save_material_file(material)
+    material_file_name = upload_material_file.save_material_file(material, file_name=id)
 
     thumb = request.FILES.get('thumb')
     thumb_file_name = upload_material_file.save_thumb_file(thumb)
@@ -36,6 +40,11 @@ def save_template(request):
     origin_price = int(100 * float(request.POST.get('origin_price')))
     on_sale_price = int(100 * float(request.POST.get('on_sale_price')))
 
+    ios_version = int(request.POST.get('ios_version'))
+    android_version = int(request.POST.get('android_version'))
+    version = int(time.time() * 1000)
+    appstore_merchant_id = request.POST.get('appstore_merchant_id')
+
     template = Templates()
     template.save_template(id=id,
                            title=title,
@@ -49,7 +58,11 @@ def save_template(request):
                            duration=duration,
                            material=material_file_name,
                            origin_price=origin_price,
-                           on_sale_price=on_sale_price
+                           on_sale_price=on_sale_price,
+                           ios_version=ios_version,
+                           android_version=android_version,
+                           version=version,
+                           appstore_merchant_id=appstore_merchant_id
                            )
 
     return HttpResponseRedirect('/template/list')
@@ -63,6 +76,7 @@ def modify_template(request):
     t['tags'] = ';'.join(t['tags'])
     t['on_sale_price'] /= 100
     t['origin_price'] /= 100
+    t.update(**{'ios_versions': versions.retrieve_ios_versions(), 'android_versions': versions.retrieve_android_versions()})
     return render(request, 'modify_template.html', t)
 
 
@@ -81,7 +95,7 @@ def save_modify_template(request):
 
     material = request.FILES.get('material')
     if bool(material):
-        material_file_name = upload_material_file.save_material_file(material)
+        material_file_name = upload_material_file.save_material_file(material, file_name=id)
 
     thumb = request.FILES.get('thumb')
     if bool(thumb):
@@ -98,6 +112,13 @@ def save_modify_template(request):
 
     origin_price = int(100 * float(request.POST.get('origin_price')))
     on_sale_price = int(100 * float(request.POST.get('on_sale_price')))
+    ios_version = int(request.POST.get('ios_version'))
+    android_version = int(request.POST.get('android_version'))
+    available = 'valid'
+    if ios_version == versions.UNSUPPORTED and android_version == versions.UNSUPPORTED:
+        available = 'invalid'
+    version = int(time.time() * 1000)
+    appstore_merchant_id = request.POST.get('appstore_merchant_id')
 
     template = Templates()
     template.update_template(id=id,
@@ -112,7 +133,12 @@ def save_modify_template(request):
                              duration=duration,
                              material=material_file_name,
                              origin_price=origin_price,
-                             on_sale_price=on_sale_price
+                             on_sale_price=on_sale_price,
+                             ios_version=ios_version,
+                             android_version=android_version,
+                             version=version,
+                             appstore_merchant_id=appstore_merchant_id,
+                             available=available
                              )
 
     return HttpResponseRedirect('/template/list')
@@ -122,4 +148,7 @@ def save_modify_template(request):
 def list_template(request):
     template = Templates()
     templates = template.retrieve()
+    for t in templates:
+        t['on_sale_price'] /= 100
+        t['origin_price'] /= 100
     return render(request, 'list_template.html', {'templates': templates})

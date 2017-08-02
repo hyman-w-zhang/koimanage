@@ -31,6 +31,22 @@
             </div>
         </div>
 
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_version_config">版本配置</a>
+                </h4>
+            </div>
+            <div id="collapse_version_config" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_version' %}">
+                   版本管理
+                </div>
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_api_config' %}">
+                   配置管理
+                </div>
+            </div>
+        </div>
+
         
     </div>
 </div>

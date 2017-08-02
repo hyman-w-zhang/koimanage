@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li><a href="{% url 'list_api_config' %}">配置管理</a></li>
+        <li class="active">添加配置</li>
+    </ol>
+    <form action="{% url 'save_modified_api_config' %}" role="form" method="post" enctype="multipart/form-data" data-toggle="validator">
+        {% csrf_token %}
+        <input type="hidden" id="id" name="id" value="{{ id }}">
+        <div class="form-group">
+            <label>iOS最低版本</label>
+            <div class="input-group">
+                <span class="input-group-addon">iOS:</span>
+                <select id="min_ios_version" name="min_ios_version" class="select form-control" required>
+                    {% for iv in ios_versions %}
+                        {% if iv.code == min_ios_version %}
+                            <option value="{{ iv.code }}" selected="selected">{{ iv.name }}</option>
+                        {% else %}
+                            <option value="{{ iv.code }}" >{{ iv.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>android最低版本</label>
+            <div class="input-group">
+                <span class="input-group-addon">android:</span>
+                <select id="min_android_version" name="min_android_version" class="select form-control">
+                    {% for av in android_versions %}
+                        {% if av.code == min_android_version %}
+                            <option value="{{ av.code }}" selected="selected">{{ av.name }}</option>
+                        {% else %}
+                            <option value="{{ av.code }}" >{{ av.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>iOS最新版本</label>
+            <div class="input-group">
+                <span class="input-group-addon">iOS:</span>
+                <select id="latest_ios_version" name="latest_ios_version" class="select form-control">
+                    {% for iv in ios_versions %}
+                        {% if iv.code == latest_ios_version %}
+                            <option value="{{ iv.code }}" selected="selected">{{ iv.name }}</option>
+                        {% else %}
+                            <option value="{{ iv.code }}" >{{ iv.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>android最新版本</label>
+            <div class="input-group">
+                <span class="input-group-addon">android:</span>
+                <select id="latest_android_version" name="latest_android_version" class="select form-control" required>
+                    {% for av in android_versions %}
+                        {% if av.code == latest_android_version %}
+                            <option value="{{ av.code }}" selected="selected">{{ av.name }}</option>
+                        {% else %}
+                            <option value="{{ av.code }}" >{{ av.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>APK下载地址：</label>
+            <input type="text" id="apk_download_url" name="apk_download_url" class="form-control add-clear" maxlength="512" value="{{ apk_download_url }}">
+        </div>
+
+        <div class="form-group">
+            <label>支持的支付方式：</label>
+            <input type="number" id="supported_pay" name="supported_pay" class="form-control add-clear" value="{{ supported_pay }}">
+        </div>
+
+        <div class="center">
+            <button type="submit" class="btn btn-default">提交</button>
+        </div>
+    </form>
+
+{% endblock %}

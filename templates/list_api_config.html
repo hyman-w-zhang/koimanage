@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">配置查看</li>
+    </ol>
+    <a href="{% url 'add_api_config' %}" class="btn btn-success">添加</a>
+    <div>
+        <table class="table">
+            <caption>配置列表</caption>
+            <thead>
+                <tr>
+                    <th>iOS最低版本</th>
+                    <th>iOS最高版本</th>
+                    <th>android最低版本</th>
+                    <th>android最高版本</th>
+                    <th>APK下载地址</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for api_config in api_configs %}
+                    <tr>
+                        <td>
+                            <select id="min_ios_version" name="min_ios_version" class="select form-control" disabled>
+                                {% for iv in ios_versions %}
+                                    {% if iv.code == api_config.min_ios_version %}
+                                        <option value="{{ iv.code }}" selected="selected">{{ iv.name }}</option>
+                                    {% else %}
+                                        <option value="{{ iv.code }}" >{{ iv.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select id="latest_ios_version" name="latest_ios_version" class="select form-control" disabled>
+                                {% for iv in ios_versions %}
+                                    {% if iv.code == api_config.latest_ios_version %}
+                                        <option value="{{ iv.code }}" selected="selected">{{ iv.name }}</option>
+                                    {% else %}
+                                        <option value="{{ iv.code }}" >{{ iv.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select id="min_android_version" name="min_android_version" class="select form-control" disabled>
+                                {% for iv in android_versions %}
+                                    {% if iv.code == api_config.min_android_version %}
+                                        <option value="{{ iv.code }}" selected="selected">{{ iv.name }}</option>
+                                    {% else %}
+                                        <option value="{{ iv.code }}" >{{ iv.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <select id="latest_android_version" name="latest_android_version" class="select form-control" disabled>
+                                {% for iv in android_versions %}
+                                    {% if iv.code == api_config.latest_android_version %}
+                                        <option value="{{ iv.code }}" selected="selected">{{ iv.name }}</option>
+                                    {% else %}
+                                        <option value="{{ iv.code }}" >{{ iv.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><a href="{{ api_config.apk_download_url }}">点击下载</a></td>
+                        <td>
+                            <a href="/api_config/modify/{{ api_config.id }}" class="btn btn-primary">修改</a>
+                            <a href="/api_config/delete/{{ api_config.id }}" class="btn btn-danger">删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

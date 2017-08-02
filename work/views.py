@@ -19,7 +19,7 @@ def list_work(request):
 
 @login_required
 def retrieve_works(request):
-    page_no = int(request.POST.get('page_no', '') or 1)
+    page_no = int(request.POST.get('page', '') or 1)
     page_size = int(request.POST.get('page_size', '') or 10)
     created_start, created_end = None, None
     created_start_str = request.POST.get('created_date_begin', '')
