@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from template import urls as template_urls
 from work import urls as work_urls
+from user import urls as user_urls
 from . import views
 
 urlpatterns = [
@@ -25,6 +26,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls, name='admin'),
     url(r'template/', include(template_urls)),
     url(r'work/', include(work_urls)),
+    url(r'user/', include(user_urls)),
+
     url(r'^version/add', view=views.add_version, name='add_version'),
     url(r'^version/list', view=views.retrieve_versions, name='list_version'),
     url(r'^version/save', view=views.save_version, name='save_version'),
@@ -36,4 +39,11 @@ urlpatterns = [
     url(r'^api_config/save_modified', view=views.save_modified_api_config, name='save_modified_api_config'),
     url(r'^api_config/modify/([\w\-]+)', view=views.modify_api_config, name='modify_api_config'),
     url(r'^api_config/delete/([\w\-]+)', view=views.delete_api_config, name='delete_api_config'),
+
+    url(r'^merchandise/add', view=views.add_merchandise, name='add_merchandise'),
+    url(r'^merchandise/list', view=views.list_merchandise, name='list_merchandise'),
+    url(r'^merchandise/retrieve', view=views.retrieve_merchandises, name='retrieve_merchandises'),
+    url(r'^merchandise/save$', view=views.save_merchandise, name='save_merchandise'),
+    url(r'^merchandise/disable/([\w\-]+)', view=views.disable_merchandise, name='disable_merchandise'),
+
 ]

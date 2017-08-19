@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+
+    <script>
+        $('document').ready(function(){
+            $('table tbody').sortable({'revert': true});
+        });
+
+        function save_sort(){
+            var sorted_data = $('tr.ui-sortable-handle td input');
+            var sorted_ids = [];
+            for(var i = 0; i < sorted_data.length; i++) {
+                sorted_ids.push(sorted_data[i].value);
+            }
+            $.ajax({
+                'url' : '/template/save_category_templates_order',
+                'type' : 'POST',
+                'data' : {
+                    'sorted_ids': sorted_ids.join(','),
+                    'category_id': '{{ category_id }}'
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    alert(data.msg);
+                    location.href = 'javascript:location.reload();';
+                }
+            });
+        }
+
+        function cancel_recommend(index){
+            var template_id = $('#template_id_' + index).val();
+            $.ajax({
+                'url' : '/template/remove_template_from_category',
+                'data' : {
+                    'template_id': template_id,
+                    'category_id': '{{ category_id }}'
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    if (data.code == 0) {
+                        $('#template_wrapper_' + index).hide();
+                        location.href = 'javascript:location.reload();';
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li><a href="{% url 'list_template_categories' %}">模板分类管理</a></li>
+        <li class="active">分类模板</li>
+    </ol>
+
+    <table class="table">
+        <caption>模板列表</caption>
+        <thead>
+            <tr>
+                <th width="10%">序号</th>
+                <th width="25%">模板</th>
+                <th width="10%">模板ID</th>
+                <th width="10%">模板名称</th>
+                <th width="10%">模板描述</th>
+                <th width="10%">创建时间</th>
+                <th width="10%">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for template in templates %}
+            <tr id="template_wrapper_{{ forloop.counter }}">
+                <td id="template_{{ forloop.counter }}">
+                    <div>{{ forloop.counter }}</div>
+                    <input type="hidden"  id="template_id_{{ forloop.counter }}" value="{{ template.id }}"/>
+                </td>
+                
+                <td>
+                    <a href="{{ template.video }}" target="_blank"><video height="128" src="{{ template.video }}" poster="{{ template.thumb }}" loop="loop"></video></a>
+                    <div>
+                        <span style="height:20px;background-color:#ccc;">
+                            <span style="position:relative;">时长： {{ template.duration }}ms</span>
+                            <span style="position:relative;padding-left:30px;">尺寸：{{ template.width }}<b>x</b>{{ template.height }}</span>
+                        </span>
+                    </div>
+                </td>
+                
+                <td><div><span>{{ template.id }}</span></div></td>
+
+                <td><div><span>{{ template.title }}</span></div></td>
+
+                <td><div><span>{{ template.description }}</span></div></td>
+
+                <td><div><span>{{ template.created }}</span></div></td>
+
+                <td>
+                    <div>
+                        <div style="display:inline;">
+                            <button class="btn btn-md btn-danger" onclick="cancel_recommend({{ forloop.counter }});">移除分类</button>
+                        </div>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="center">
+        <button type="button" id="save-sort" class="btn btn-md btn-primary" onclick="save_sort();">保存排序</button>
+    </div>
+
+{% endblock %}

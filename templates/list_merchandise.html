@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+    <script type="text/javascript">
+
+        function retrieve_merchandises(){
+            var type = $('#type').val();
+            var platform = $('#platform').val();
+            var status = $('#status').val();
+
+            $.ajax({
+                'url' : '/merchandise/retrieve',
+                'type' : 'POST',
+                'data' : {
+                    'type' : type,
+                    'platform': platform,
+                    'status': status
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_merchandises_data(data);
+                }
+            });
+        }
+
+        function update_merchandises_data(merchandises_data){
+            if (merchandises_data.length == 0) {
+                $('#merchandises').html('没有找到匹配的商品信息');
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>商品列表</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="15%">名称</th>';
+            material_html += '<th width="10%">类型</th>';
+            material_html += '<th width="20%">平台</th>';
+            material_html += '<th width="10%">价格</th>';
+            material_html += '<th width="10%">锦鲤币数量</th>';
+            material_html += '<th width="10%">操作</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            merchandises_data.forEach(function(merchandise) {
+
+                material_html += '<tr id="merchandise_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="merchandise_id_' + i + '" value="' + merchandise.id + '"></td>';
+
+                material_html += '<td><div><span>' + merchandise.name + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.type + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.platform + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.price + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.coin + '</span></div></td>';
+
+                // actions
+                material_html += '<td><div>';
+
+                material_html += '<div id="disable_' + i + '" style=';
+                material_html += (merchandise.status == 'enable' ? '"display:inline;"' : '"display:none;"');
+                material_html += '><button class="btn btn-md btn-danger" onclick="disable_merchandise(' + i + ');">下架</div>';
+                material_html += '<div id="enable_' + i + '" style=';
+                material_html += (merchandise.status == 'disable' ? '"display:inline;"' : '"display:none;"');
+                material_html += '>已下架</div>';
+
+                material_html += '</div>';
+
+                material_html += '</td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#merchandises').html(material_html);
+        }
+
+
+        function disable_merchandise(index){
+            var merchandise_id = $('#merchandise_id_' + index).val();
+            $.ajax({
+                'url' : '/merchandise/disable/' + merchandise_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        retrieve_merchandises();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">商品管理</li>
+    </ol>
+
+    <div class="form-group col-md-12">
+        <a href="{% url 'add_merchandise' %}" class="btn btn-success">添加商品</a>
+    </div>
+
+    <form id="form" data-toggle="validator">
+        {% csrf_token %}
+
+        <div class="form-group col-md-12">
+
+
+            <div class="col-md-4">
+                <label class="col-md-4">商品类型：</label>
+                <select id="type" name="type" class="select col-md-6 form-leo">
+                    <option value="koicoin">锦鲤币</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+
+            <label>支持的平台：</label>
+                <select id="platform" name="platform" class="select col-md-6 form-leo" required>
+                    <option value="">全部</option>
+                    <option value="iap">苹果支付</option>
+                    <option value="common">通用(微信,支付宝)</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="col-md-4">商品类型：</label>
+                <select id="status" name="status" class="select col-md-6 form-leo">
+                    <option value="">全部</option>
+                    <option value="enable">启用</option>
+                    <option value="disable">禁用</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="search-merchandises" class="btn btn-md btn-primary" onclick="retrieve_merchandises();">查找</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div id="merchandises"></div>
+
+
+{% endblock %}

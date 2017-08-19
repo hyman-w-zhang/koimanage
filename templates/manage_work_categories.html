@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#create_date_begin').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            $('#create_date_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            search_works();
+        });
+
+        function search_works(){
+            var base_create_date_begin = ($('#create_date_begin').val() || '1970-01-01')+ ' 00:00:00';
+            var base_create_date_end = ($('#create_date_end').val() || '9999-12-31') + ' 23:59:59';
+            var page = $('#page_select').val() || 1;
+            var page_size = $('#page_size_select').val() || 10;
+            var template = $('#template').val();
+
+            $.ajax({
+                'url' : '/work/retrieve_enable',
+                'type' : 'POST',
+                'data' : {
+                    'base_create_date_begin' : base_create_date_begin,
+                    'base_create_date_end': base_create_date_end,
+                    'page': page,
+                    'page_size': page_size,
+                    'template': template
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_works_data(data);
+                }
+            });
+        }
+
+        function update_works_data(data){
+            var works_data = data.works;
+            var total = data.total;
+            var categories = data.categories;
+            if (works_data.length == 0) {
+                $('#works').html('没有找到匹配的作品信息');
+                $('#paging').hide();
+                return;
+            }
+            var page = $('#page_select').val() || 1;
+            var page_size = $('#page_size_select').val();
+            var material_html = '<table class="table"><caption>作品列表</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="15%">作品</th>';
+            material_html += '<th width="10%">作品ID</th>';
+            material_html += '<th width="10%">用户ID</th>';
+            material_html += '<th width="20%">上传时间</th>';
+            material_html += '<th width="20%">分类</th>';
+            material_html += '<th width="10%">操作</th>';
+            material_html += '</tr></thead><tbody>';
+            //works_data.forEach(function(work) {
+            var j = 1;
+            for(var i in works_data) {
+                var work = works_data[i];
+                material_html += '<tr id="work_' + j + '">';
+
+                material_html += '<td><div>';
+                material_html += j + '</div><input type="hidden" id="work_id_' + (i + 1) + '" value="' + work.id + '"></td>';
+
+                material_html += '<td><a href="' + work.video + '" target="_blank"><video height="128" src="' + work.video + '"';
+                //material_html += ' autoplay="autoplay"';
+                material_html += ' poster="' + work.thumb + '"';
+                material_html += ' loop="loop"></video></a>';
+                material_html += '<div><span style="height:20px;background-color:#ccc;"><span style="position:relative;">时长：' + (work.duration / 1000) + 's';
+                material_html += '<span style="position:relative;padding-left:30px;">尺寸：' + work.width + ' <b>x</b> ' + work.height + '</span>';
+                material_html += '</span></div></td>';
+
+                material_html += '<td><div><span>' + work.id + '</span></div></td>';
+
+                material_html += '<td><div><span>' + work.author + '</span></div></td>';
+
+                material_html += '<td><div><span>' + work.created + '</span></div></td>';
+
+                material_html += '<td><div><span>' + work.categories_names.join(', ') + '</span></div></td>';
+
+
+                // actions
+                material_html += '<td><div>';
+
+                for(var i in categories) {
+                    var category = categories[i];
+                    material_html += '<span>' + category['name'] + '</span>';
+                    if (work['categories_ids'].indexOf(category['id']) > -1) {
+                        material_html += '<button class="btn btn-md btn-danger" onclick="remove_work_from_category(' + "'" + work['id'] + "', '" + category['id'] + "'" + ');">下架</button>';
+                    } else {
+                    material_html += '<button class="btn btn-md btn-primary" onclick="add_work_to_category(' + "'" + work['id'] + "', '" + category['id'] + "'" + ');">加入</button>'
+
+                    material_html += '<button class="btn btn-md btn-success" onclick="sticky_work_to_category(' + "'" + work['id'] + "', '" + category['id'] + "'" + ');">置顶</button>'
+                    }
+                    material_html += '<br/>';
+                }
+                material_html += '</div>';
+
+                material_html += '</td>';
+
+                material_html += '</tr>';
+
+                j++;
+
+            }
+            material_html += '</tbody></table>';
+            $('#works').html(material_html);
+
+            var total_count = data.total || bases_data.length;
+            var total_page = Math.ceil(total_count / page_size);
+            $('#paging').show();
+            var page_select = document.getElementById('page_select');
+            page_select.options.length = 0;
+            for(var i = 1; i <= total_page; i++) {
+                page_select.options.add(new Option(i, i));
+            }
+            page_select.options[page - 1].selected = true;
+            $('#paging_info').html('<span>共找到条<b>' + total_count + '</b>记录。 每页<b>' + page_size + '</b>条，共<b>' + total_page + '</b>页<input type="hidden" id="total_page" value="' + total_page + '"/></span>');
+        }
+
+        function remove_work_from_category(work_id, category_id){
+            $.ajax({
+                'url' : '/work/remove_work_from_category?work_id=' + work_id + '&category_id=' + category_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        search_works();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function add_work_to_category(work_id, category_id){
+            $.ajax({
+                'url' : '/work/add_work_to_category?work_id=' + work_id + '&category_id=' + category_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        search_works();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+        function sticky_work_to_category(work_id, category_id){
+            $.ajax({
+                'url' : '/work/sticky_work_to_category?work_id=' + work_id + '&category_id=' + category_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        search_works();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">作品分类管理</li>
+    </ol>
+
+    <form id="form" data-toggle="validator">
+        {% csrf_token %}
+
+        <!--<div class="form-group col-md-12">-->
+            <!--<div class="col-md-4"><a class="btn btn-primary" href="{% url 'recommend_works' %}">查看推荐作品</a> </div>-->
+        <!--</div>-->
+
+        <div class="form-group col-md-12">
+            <div class="col-md-4">
+                <label class="col-md-3">时间</label>
+                <input type="text" id="create_date_begin" name="create_date_begin" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+                <span class="col-md-1 center">_</span>
+                <input type="text" id="create_date_end" name="create_date_end" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="col-md-4">模板：</label>
+                <select id="template" name="template" class="select col-md-6 form-leo">
+                    <option value="">全部</option>
+                    {% for template in templates %}
+                        <option value="{{ template.id }}">{{ template.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" id="search-works" class="btn btn-md btn-primary" onclick="search_works();">查找</button>
+            </div>
+        </div>
+
+    </form>
+    <div>
+        <div id="works"></div>
+        <div id="paging" style="display:none;">
+            <label class="col-md-1">每页大小：</label>
+            <select class="col-md-1" id="page_size_select" onchange="search_works();">
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+            <label class="col-md-1">页码：</label>
+            <select class="col-md-1" id='page_select' onchange="search_works();">
+            </select>
+            <div id="paging_info" class="col-md-6"></div>
+        </div>
+    </div>
+
+
+{% endblock %}

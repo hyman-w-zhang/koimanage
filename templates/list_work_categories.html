@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+
+    <script type="text/javascript">
+
+        function retrieve_work_categories(){
+            var type = $('#type').val();
+            var platform = $('#platform').val();
+            var status = $('#status').val();
+
+            $.ajax({
+                'url' : '/merchandise/retrieve',
+                'type' : 'POST',
+                'data' : {
+                    'type' : type,
+                    'platform': platform,
+                    'status': status
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_work_categories_data(data);
+                }
+            });
+        }
+
+        function update_work_categories_data(work_categories_data){
+            if (work_categories_data.length == 0) {
+                $('#work_categories').html('没有找到匹配的商品信息');
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>商品列表</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="15%">名称</th>';
+            material_html += '<th width="10%">类型</th>';
+            material_html += '<th width="20%">平台</th>';
+            material_html += '<th width="10%">价格</th>';
+            material_html += '<th width="10%">锦鲤币数量</th>';
+            material_html += '<th width="10%">操作</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            work_categories_data.forEach(function(merchandise) {
+
+                material_html += '<tr id="merchandise_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="merchandise_id_' + i + '" value="' + merchandise.id + '"></td>';
+
+                material_html += '<td><div><span>' + merchandise.name + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.type + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.platform + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.price + '</span></div></td>';
+
+                material_html += '<td><div><span>' + merchandise.coin + '</span></div></td>';
+
+                // actions
+                material_html += '<td><div>';
+
+                material_html += '<div id="disable_' + i + '" style=';
+                material_html += (merchandise.status == 'enable' ? '"display:inline;"' : '"display:none;"');
+                material_html += '><button class="btn btn-md btn-danger" onclick="disable_merchandise(' + i + ');">下架</div>';
+                material_html += '<div id="enable_' + i + '" style=';
+                material_html += (merchandise.status == 'disable' ? '"display:inline;"' : '"display:none;"');
+                material_html += '>已下架</div>';
+
+                material_html += '</div>';
+
+                material_html += '</td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#work_categories').html(material_html);
+        }
+
+
+        function disable_merchandise(index){
+            var merchandise_id = $('#merchandise_id_' + index).val();
+            $.ajax({
+                'url' : '/merchandise/disable/' + merchandise_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        retrieve_work_categories();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">推荐分类管理</li>
+    </ol>
+
+    <div class="form-group col-md-12">
+        <a href="{% url 'add_work_category' %}" class="btn btn-success">添加分类</a>
+    </div>
+
+    <div id="work_categories">
+        <table class="table">
+            <caption>推荐分类列表</caption>
+            <thead>
+                <tr>
+                    <th width="10%">序号</th>
+                    <th width="25%">标题</th>
+                    <th width="10%">分类</th>
+                    <th width="50%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work_category in work_categories %}
+                    <tr>
+                        <td><input type="hidden"  value="{{ work_category.id }}"/>{{ forloop.counter }}</td>
+                        <td>{{ work_category.name }}</td>
+                        <td>{{ work_category.type }}</td>
+
+                        <td><a href="/work/manage_category_works?id={{ work_category.id }}" class="btn btn-danger">编辑作品列表</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

@@ -28,6 +28,41 @@
                 <div class="accordion-inner panel-body ripple" href="{% url 'add_template' %}">
                    添加模板
                 </div>
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_template_categories' %}">
+                   模板分类
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_categories">分类管理</a>
+                </h4>
+            </div>
+            <div id="collapse_categories" class="panel-collapse collapse">
+                <!--<div class="accordion-inner panel-body ripple" href="{% url 'add_work_category' %}">-->
+                   <!--添加分类-->
+                <!--</div>-->
+                <div class="accordion-inner panel-body ripple" href="{% url 'manage_work_categories' %}">
+                   分类作品
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_merchandise">商品管理</a>
+                </h4>
+            </div>
+            <div id="collapse_merchandise" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_merchandise' %}">
+                   查看商品
+                </div>
+                <div class="accordion-inner panel-body ripple" href="{% url 'add_merchandise' %}">
+                   添加商品
+                </div>
             </div>
         </div>
 
@@ -46,6 +81,8 @@
                 </div>
             </div>
         </div>
+
+
 
         
     </div>

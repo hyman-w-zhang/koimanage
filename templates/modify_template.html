@@ -15,7 +15,7 @@
         <div class="form-group">
             <label>ID：</label>
             <input type="text" id="id" name="id" class="form-control add-clear" maxlength="128" pattern="^[a-zA-Z0-9\-_]+$" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" value="{{ id }}"
-                   required>
+                   required readonly>
         </div>
         <div class="form-group">
             <label>标题：</label>
@@ -43,11 +43,11 @@
         </div>
         <div class="form-group">
             <label>原价：</label>
-            <input type="text" id="origin_price" name="origin_price" class="form-control add-clear" required pattern="^\d+(\.\d{1, 2})?$" value="{{ origin_price }}">
+            <input type="text" id="origin_price" name="origin_price" class="form-control add-clear" required pattern="^\d+$" value="{{ origin_price }}">
         </div>
         <div class="form-group">
             <label>促销价格：</label>
-            <input type="text" id="on_sale_price" name="on_sale_price" class="form-control add-clear" required pattern="^\d+(\.\d{1, 2})?$" value="{{ on_sale_price }}">
+            <input type="text" id="on_sale_price" name="on_sale_price" class="form-control add-clear" required pattern="^\d+$" value="{{ on_sale_price }}">
         </div>
 
         <div class="form-group">

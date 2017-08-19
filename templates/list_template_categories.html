@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+
+    <script type="text/javascript">
+
+        function retrieve_template_categories(){
+            var type = $('#type').val();
+            var platform = $('#platform').val();
+            var status = $('#status').val();
+
+            $.ajax({
+                'url' : '/template/retrieve',
+                'type' : 'POST',
+                'data' : {
+                    'type' : type,
+                    'platform': platform,
+                    'status': status
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_template_categories_data(data);
+                }
+            });
+        }
+
+        function update_template_categories_data(template_categories_data){
+            if (template_categories_data.length == 0) {
+                $('#template_categories').html('没有找到匹配的模板信息');
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>模板列表</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="15%">名称</th>';
+            material_html += '<th width="10%">类型</th>';
+            material_html += '<th width="20%">平台</th>';
+            material_html += '<th width="10%">价格</th>';
+            material_html += '<th width="10%">锦鲤币数量</th>';
+            material_html += '<th width="10%">操作</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            template_categories_data.forEach(function(template) {
+
+                material_html += '<tr id="template_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="template_id_' + i + '" value="' + template.id + '"></td>';
+
+                material_html += '<td><div><span>' + template.name + '</span></div></td>';
+
+                material_html += '<td><div><span>' + template.type + '</span></div></td>';
+
+                material_html += '<td><div><span>' + template.platform + '</span></div></td>';
+
+                material_html += '<td><div><span>' + template.price + '</span></div></td>';
+
+                material_html += '<td><div><span>' + template.coin + '</span></div></td>';
+
+                // actions
+                material_html += '<td><div>';
+
+                material_html += '<div id="disable_' + i + '" style=';
+                material_html += (template.status == 'enable' ? '"display:inline;"' : '"display:none;"');
+                material_html += '><button class="btn btn-md btn-danger" onclick="disable_template(' + i + ');">下架</div>';
+                material_html += '<div id="enable_' + i + '" style=';
+                material_html += (template.status == 'disable' ? '"display:inline;"' : '"display:none;"');
+                material_html += '>已下架</div>';
+
+                material_html += '</div>';
+
+                material_html += '</td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#template_categories').html(material_html);
+        }
+
+
+        function disable_template(index){
+            var template_id = $('#template_id_' + index).val();
+            $.ajax({
+                'url' : '/template/disable/' + template_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        retrieve_template_categories();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li><a href="{% url 'list_template' %}">模板管理</a></li>
+        <li class="active">模板分类管理</li>
+    </ol>
+
+    <div class="form-group col-md-12">
+        <a href="{% url 'add_template_category' %}" class="btn btn-success">添加分类</a>
+    </div>
+
+    <div id="template_categories">
+        <table class="table">
+            <caption>推荐分类列表</caption>
+            <thead>
+                <tr>
+                    <th width="10%">序号</th>
+                    <th width="25%">标题</th>
+                    <th width="10%">排序</th>
+                    <th width="50%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for template_category in template_categories %}
+                    <tr>
+                        <td><input type="hidden"  value="{{ template_category.id }}"/>{{ forloop.counter }}</td>
+                        <td>{{ template_category.name }}</td>
+                        <td>{{ template_category.order }}</td>
+
+                        <td><a href="/template/manage_category_templates?id={{ template_category.id }}" class="btn btn-primary">编辑模板列表</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

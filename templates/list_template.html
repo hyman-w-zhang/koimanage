@@ -11,35 +11,65 @@
             });
         });
 
-        function save_sort(){
-            var category = $('#category').val();
-            var sorted_data = $('tr.ui-sortable-handle td input');
-            var sorted_ids = [];
-            for(var i = 0; i < sorted_data.length; i++) {
-                sorted_ids.push(sorted_data[i].value);
-            }
-            var data = {'category': category, 'sorted_ids': sorted_ids.join(',')}
+        function remove_template_from_category(template_id, category_id){
             $.ajax({
-                'url' : '/xbase/template_order',
-                'type' : 'POST',
-                'data' : data,
-                'dataType': 'json',
+                'url' : '/template/remove_template_from_category?template_id=' + template_id + '&category_id=' + category_id,
+                'type' : 'GET',
+                'dataType' : 'json',
                 success : function(data) {
-                    window.location.href = '/xbase/edit_template_order/' + category;
+                    if (data.code == 0) {
+                        location.href = 'javascript:location.reload();';
+                    } else {
+                        alert(data.msg);
+                    }
                 }
             });
         }
+
+        function add_template_to_category(template_id, category_id){
+            $.ajax({
+                'url' : '/template/add_template_to_category?template_id=' + template_id + '&category_id=' + category_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        location.href = 'javascript:location.reload();';
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+        function sticky_template_to_category(template_id, category_id){
+            $.ajax({
+                'url' : '/template/sticky_template_to_category?template_id=' + template_id + '&category_id=' + category_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        location.href = 'javascript:location.reload();';
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
     </script>
 {% endblock %}
 
 {% block 'content' %}
     <ol class="breadcrumb">
         <li><a href="{% url 'admin_home' %}">首页</a></li>
-        <li class="active">模板查看</li>
+        <li class="active">模板管理</li>
     </ol>
     <div class="form-group">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="{% url 'add_template' %}" class="btn btn-success">添加</a>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'list_template_categories' %}" class="btn btn-primary">分类管理</a>
         </div>
     </div>
 
@@ -52,12 +82,14 @@
                     <th width="10%">视频</th>
                     <!--<th>缩略图</th>-->
                     <!--<th>海报</th>-->
-                    <th width="15%">标题</th>
-                    <th width="25%">描述</th>
-                    <th width="10%">分类</th>
+                    <th width="10%">标题</th>
+                    <th width="15%">描述</th>
+                    <th width="10%">类型</th>
                     <th width="5%">资源包</th>
                     <th width="5%">原价</th>
                     <th width="5%">促销价</th>
+                    <!--<th width="5%">分类</th>-->
+                    <th width="15%">修改分类</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -75,18 +107,34 @@
                         <td>{{ template.origin_price }}</td>
                         <td>{{ template.on_sale_price }}</td>
 
+                        <!--<td>-->
+                        <!--{% for t in template.categories_names %}-->
+                            <!--<span>{{ t }}<br/></span>-->
+                        <!--{% endfor %}-->
+                        <!--</td>-->
+
+                        <td>
+                            {% for category in categories %}
+
+                                {% if category.id in template.categories_ids %}
+                                    <span><b>{{ category.name }}</b></span>
+                                    <button class="btn btn-md btn-danger" onclick="remove_template_from_category('{{template.id}}', '{{ category.id }}');">移除分类</button><br/>
+                                {% else %}
+                                    <span>{{ category.name }}</span>
+                                    <button class="btn btn-md btn-primary" onclick="add_template_to_category('{{template.id}}', '{{ category.id }}');">加入</button>
+                                    <button class="btn btn-md btn-success" onclick="sticky_template_to_category('{{template.id}}', '{{ category.id }}');">置顶</button><br/>
+                                {% endif %}
+                                <hr style="margin: 2px 0;"/>
+                            {% endfor %}
+                        </td>
+
                         <!--<td><a href="/template/delete?id={{ template.id }}" class="btn btn-danger" onclick="return confirm('确定要删除该模板？');">删除</a></td>-->
-                        <td><a href="/template/modify?id={{ template.id }}" class="btn btn-danger">修改</a></td>
+                        <td><a href="/template/modify?id={{ template.id }}" class="btn btn-success">修改</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        {% if category %}
-        <div class="center">
-            <button type="button" id="save-sort" class="btn btn-md btn-primary" onclick="save_sort();">已确认排序，点击应用修改</button>
-        </div>
-        {% endif %}
     </div>
 
 {% endblock %}

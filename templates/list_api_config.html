@@ -16,6 +16,7 @@
                     <th>android最低版本</th>
                     <th>android最高版本</th>
                     <th>APK下载地址</th>
+                    <th>是否强制登录</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -66,10 +67,25 @@
                                 {% endfor %}
                             </select>
                         </td>
+
                         <td><a href="{{ api_config.apk_download_url }}">点击下载</a></td>
                         <td>
+                            <div class="form-group">
+                                <select id="force_login" name="force_login" class="select form-control" disabled>
+                                    {% if api_config.force_login %}
+                                    <option value="0">否</option>
+                                    <option value="1" selected="selected">是</option>
+                                    {% else %}
+                                    <option value="0" selected="selected">否</option>
+                                    <option value="1">是</option>
+
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </td>
+                        <td>
                             <a href="/api_config/modify/{{ api_config.id }}" class="btn btn-primary">修改</a>
-                            <a href="/api_config/delete/{{ api_config.id }}" class="btn btn-danger">删除</a>
+                            <!--<a href="/api_config/delete/{{ api_config.id }}" class="btn btn-danger">删除</a>-->
                         </td>
                     </tr>
                 {% endfor %}

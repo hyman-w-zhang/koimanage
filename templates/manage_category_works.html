@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+
+    <script>
+        $('document').ready(function(){
+            $('table tbody').sortable({'revert': true});
+        });
+
+        function save_sort(){
+            var sorted_data = $('tr.ui-sortable-handle td input');
+            var sorted_ids = [];
+            for(var i = 0; i < sorted_data.length; i++) {
+                sorted_ids.push(sorted_data[i].value);
+            }
+            $.ajax({
+                'url' : '/work/save_category_works_order',
+                'type' : 'POST',
+                'data' : {
+                    'sorted_ids': sorted_ids.join(','),
+                    'category_id': '{{ category_id }}'
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    alert(data.msg);
+                    location.href = 'javascript:location.reload();';
+                }
+            });
+        }
+
+        function cancel_recommend(index){
+            var work_id = $('#work_id_' + index).val();
+            $.ajax({
+                'url' : '/work/remove_work_from_category',
+                'data' : {
+                    'work_id': work_id,
+                    'category_id': '{{ category_id }}'
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    if (data.code == 0) {
+                        $('#work_wrapper_' + index).hide();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li><a href="{% url 'list_work_categories' %}">作品分类管理</a></li>
+        <li class="active">分类作品</li>
+    </ol>
+
+    <table class="table">
+        <caption>作品列表</caption>
+        <thead>
+            <tr>
+                <th width="10%">序号</th>
+                <th width="25%">作品</th>
+                <th width="10%">作品ID</th>
+                <th width="10%">用户ID</th>
+                <th width="10%">上传时间</th>
+                <th width="10%">状态</th>
+                <th width="10%">被举报次数</th>
+                <th width="10%">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work in works %}
+            <tr id="work_wrapper_{{ forloop.counter }}">
+                <td id="work_{{ forloop.counter }}">
+                    <div>{{ forloop.counter }}</div>
+                    <input type="hidden"  id="work_id_{{ forloop.counter }}" value="{{ work.id }}"/>
+                </td>
+                
+                <td>
+                    <a href="{{ work.video }}" target="_blank"><video height="128" src="{{ work.video }}" poster="{{ work.thumb }}" loop="loop"></video></a>
+                    <div>
+                        <span style="height:20px;background-color:#ccc;">
+                            <span style="position:relative;">时长： {{ work.duration }}ms</span>
+                            <span style="position:relative;padding-left:30px;">尺寸：{{ work.width }}<b>x</b>{{ work.height }}</span>
+                        </span>
+                    </div>
+                </td>
+                
+                <td><div><span>{{ work.id }}</span></div></td>
+
+                <td><div><span>{{ work.author }}</span></div></td>
+
+                <td><div><span>{{ work.created }}</span></div></td>
+
+                <td><div><span>
+                    {% if work.status != 'disabled' %}
+                    启用
+                    {% else %}
+                    审核下架
+                    {% endif %}
+                </span></div></td>
+
+                <td><div><span>{{ work.report }}</span></div></td>
+
+                <td>
+                    <div>
+                        <div style="display:inline;">
+                            <button class="btn btn-md btn-danger" onclick="cancel_recommend({{ forloop.counter }});">取消推荐</button>
+                        </div>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="center">
+        <button type="button" id="save-sort" class="btn btn-md btn-primary" onclick="save_sort();">保存排序</button>
+    </div>
+
+{% endblock %}
