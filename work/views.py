@@ -156,7 +156,7 @@ def retrieve_enable_works(request):
 
     else:
         works = __works.retrieve(template=template, page_no=page_no, page_size=page_size, created_start=created_start, created_end=created_end)
-        total = __works.count(template=template, created_start=created_start, created_end=created_end)
+        total = __works.count_enable(template=template, created_start=created_start, created_end=created_end)
 
     manual_work_categories = __work_categories.retrieve_manual()
     work_list = list()
