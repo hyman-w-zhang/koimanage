@@ -26,8 +26,13 @@ def add_template(request):
 def save_template(request):
     id = request.POST['id']
     title = request.POST['title']
-    description = request.POST['description']
-    tags = request.POST['tags'].split(';')
+    # description = request.POST['description']
+    # tags = request.POST['tags'].split(';')
+
+    applicable = request.POST['applicable']
+    scenario = request.POST['scenario']
+    difficulty = float(request.POST['difficulty'])
+    effect = request.POST['effect']
 
     material = request.FILES.get('material')
     material_file_name = upload_material_file.save_material_file(material, file_name=id)
@@ -53,8 +58,8 @@ def save_template(request):
     template = Templates()
     template.save_template(id=id,
                            title=title,
-                           tags=tags,
-                           description=description,
+                           tags=list(),
+                           description='',
                            video=video_file_name,
                            thumb=thumb_file_name,
                            poster=poster_file_name,
@@ -67,7 +72,11 @@ def save_template(request):
                            ios_version=ios_version,
                            android_version=android_version,
                            version=version,
-                           appstore_merchant_id=appstore_merchant_id
+                           appstore_merchant_id=appstore_merchant_id,
+                           applicable=applicable,
+                           scenario=scenario,
+                           difficulty=difficulty,
+                           effect=effect
                            )
 
     template_category = TemplateCategories()
@@ -92,8 +101,13 @@ def modify_template(request):
 def save_modify_template(request):
     id = request.POST['id']
     title = request.POST['title']
-    description = request.POST['description']
-    tags = request.POST['tags'].split(';')
+    # description = request.POST['description']
+    # tags = request.POST['tags'].split(';')
+
+    applicable = request.POST['applicable']
+    scenario = request.POST['scenario']
+    difficulty = float(request.POST['difficulty'])
+    effect = request.POST['effect']
 
     material_file_name = None
     video_file_name = None
@@ -131,8 +145,8 @@ def save_modify_template(request):
     template = Templates()
     template.update_template(id=id,
                              title=title,
-                             tags=tags,
-                             description=description,
+                             tags=None,
+                             description=None,
                              video=video_file_name,
                              thumb=thumb_file_name,
                              poster=poster_file_name,
@@ -146,7 +160,11 @@ def save_modify_template(request):
                              android_version=android_version,
                              version=version,
                              appstore_merchant_id=appstore_merchant_id,
-                             available=available
+                             available=available,
+                             applicable=applicable,
+                             scenario=scenario,
+                             difficulty=difficulty,
+                             effect=effect
                              )
 
     return HttpResponseRedirect('/template/list')

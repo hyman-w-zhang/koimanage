@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+    <style>
+        #paging > a {
+            padding: 0 10px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        var curPage = 1;
+
+        function search_next_page(){
+        }
+
+        function search_comments(page){
+            //var base_create_date_begin = ($('#create_date_begin').val() || '1970-01-01')+ ' 00:00:00';
+            //var base_create_date_end = ($('#create_date_end').val() || '9999-12-31') + ' 23:59:59';
+            var page_size = $('#page_size_select').val() || 10;
+
+            $.ajax({
+                'url' : '/comment/retrieve',
+                'type' : 'POST',
+                'data' : {
+                    'page': page || 1,
+                    'page_size': page_size
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_comments_data(data);
+                }
+            });
+        }
+
+        function update_comments_data(data){
+
+            var comments_data = data['messages'];
+
+            if (comments_data.length == 0) {
+                $('#comments').html('没有找到相关评论');
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>评论列表</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="10%">用户名</th>';
+            material_html += '<th width="10%">发表时间</th>';
+            material_html += '<th width="40%">消息内容</th>';
+            material_html += '<th width="10%">作者IP</th>';
+            material_html += '<th width="5%">操作</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            comments_data.forEach(function(comment) {
+
+                material_html += '<tr id="comment_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="comment_msg_id_' + i + '" value="' + comment.id;
+                material_html += '"><input type="hidden" id="comment_user_id_' + i + '" value="' + comment.form + '"></td>';
+
+                material_html += '<td><div><span>' + comment.nickname + '</span></div></td>';
+
+                material_html += '<td><div><span>' + comment.created + '</span></div></td>';
+
+                material_html += '<td><div><span>' + comment.message + '</span></div></td>';
+
+                material_html += '<td><div><span>' + comment.ip + '</span></div></td>';
+
+                // actions
+                material_html += '<td><div>';
+
+                material_html += '<div id="delete_' + i + '"><button class="btn btn-md btn-danger" onclick="delete_comment(' + i + ');">删除</div>';
+
+                material_html += '</div>';
+
+                material_html += '</td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#comments').html(material_html);
+
+            var paging_html = '';
+            for(var i = 0; i < data['pages'].length; i++) {
+                paging_html += '<a href="javascript:search_comments(' + "'" + data['pages'][i] + "'" + ');">' + data['pages'][i] + '</a>';
+            }
+            $('#paging').html(paging_html);
+        }
+
+
+        function delete_comment(index){
+            var user_id = $('#comment_user_id_' + index).val();
+            var msg_id = $('#comment_msg_id_' + index).val();
+            $.ajax({
+                'url' : '/comment/delete?user_id=' + user_id + '&msg_id=' + msg_id,
+                'type' : 'GET',
+                'dataType' : 'json',
+                success : function(data) {
+                    if (data.code == 0) {
+                        $('#comment_' + index).hide();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">评论管理</li>
+    </ol>
+
+    <form id="form" data-toggle="validator">
+        {% csrf_token %}
+
+        <div class="form-group col-md-12">
+
+            <div class="col-md-4">
+                <label class="col-md-6">每页大小：</label>
+                <select class="col-md-5" id="page_size_select" onchange="search_comments();">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="search-comment" class="btn btn-md btn-primary" onclick="search_comments();">查找</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div id="comments"></div>
+
+    <div id="paging">
+        <!--<span>页码:</span>-->
+        <!--<a href="javascript:search_comments('1');" >首页</a>-->
+        <!--<a href="javascript:search_comments('1');" >1</a>-->
+        <!--<a href="javascript:search_comments('2');" >2</a>-->
+        <!--<a href="javascript:search_comments('3');" >3</a>-->
+        <!--<a href="javascript:search_comments('4');" >4</a>-->
+        <!--<a href="javascript:search_comments('5');" >5</a>-->
+        <!--<span>...</span>-->
+        <!--<a href="javascript:search_comments('2');" >下一页</a>-->
+    </div>
+
+{% endblock %}

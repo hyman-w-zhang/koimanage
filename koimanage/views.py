@@ -1,18 +1,22 @@
+from bson.objectid import ObjectId
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import HttpResponseRedirect
 from django.shortcuts import render
-from django.http import JsonResponse
-from django.http import HttpResponse
 
-from . import versions
 from wcbp.model import ApiConfigs
 from wcbp.model import Merchandises
+from wcbp.model import Messages
+from wcbp.model import Users
+from . import versions
 
 __api_config = ApiConfigs()
 
 __merchandise = Merchandises()
 
-from bson.objectid import ObjectId
+__messages = Messages()
+
+__users = Users()
 
 
 @login_required
@@ -171,4 +175,29 @@ def retrieve_merchandises(request):
 @login_required
 def disable_merchandise(request, _id):
     __merchandise.disable_by_id(_id)
+    return JsonResponse({'code': 0})
+
+
+@login_required
+def list_comments(request):
+    return render(request, 'list_comments.html')
+
+
+@login_required
+def retrieve_comments(request):
+    page = int(request.POST.get('page') or '1')
+    page_size = int(request.POST.get('page_size') or '10')
+    type = request.POST.get('type') or 'type'
+    messages = __messages.list_message(type=type, res='0', page=page, page_size=page_size)
+    for message in messages:
+        message['nickname'] = __users.from_id(id=message['form'])['nikename']
+    data = {'messages': messages, 'pages': [1, 2] + [i for i in range(max(3, page), 3 + max(3, page))], 'page': page}
+    return JsonResponse(data, safe=False)
+
+
+@login_required
+def delete_comment(request):
+    user_id = request.GET.get('user_id')
+    msg_id = request.GET.get('msg_id')
+    __messages.delete_message(uid=user_id, msg_id=msg_id)
     return JsonResponse({'code': 0})

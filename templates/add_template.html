@@ -16,7 +16,7 @@
         <div class="form-group">
             <label>ID：</label>
             <input type="text" id="id" name="id" class="form-control add-clear" maxlength="128" pattern="^[a-zA-Z0-9\-_]+$" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;"
-                   value="{{ id }}" required>
+                    required>
         </div>
         <div class="form-group">
             <label>标题：</label>
@@ -38,9 +38,25 @@
             <label>描述：</label>
             <input type="text" id="description" name="description" class="form-control add-clear" maxlength="128" required>
         </div>
+        <!--<div class="form-group">-->
+            <!--<label>类型：</label>-->
+            <!--<input type="text" id="tags" name="tags" class="form-control add-clear" maxlength="128" required>-->
+        <!--</div>-->
         <div class="form-group">
-            <label>类型：</label>
-            <input type="text" id="tags" name="tags" class="form-control add-clear" maxlength="128" required>
+            <label>推荐拍摄商品：</label>
+            <input type="text" id="applicable" name="applicable" class="form-control add-clear" maxlength="128">
+        </div>
+        <div class="form-group">
+            <label>推荐使用场景：</label>
+            <input type="text" id="scenario" name="scenario" class="form-control add-clear" maxlength="128">
+        </div>
+        <div class="form-group">
+            <label>拍摄难度：</label>
+            <input type="text" id="difficulty" name="difficulty" class="form-control add-clear" maxlength="128" value="3.0" required pattern="^[1-5](\.[05])?$">
+        </div>
+        <div class="form-group">
+            <label>特效描述：</label>
+            <input type="text" id="effect" name="effect" class="form-control add-clear" maxlength="128">
         </div>
         <div class="form-group">
             <label>原价：</label>

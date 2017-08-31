@@ -46,4 +46,8 @@ urlpatterns = [
     url(r'^merchandise/save$', view=views.save_merchandise, name='save_merchandise'),
     url(r'^merchandise/disable/([\w\-]+)', view=views.disable_merchandise, name='disable_merchandise'),
 
+    url(r'^comment/list', view=views.list_comments, name='list_comments'),
+    url(r'^comment/retrieve', view=views.retrieve_comments, name='retrieve_comments'),
+    url(r'^comment/delete', view=views.delete_comment, name='delete_comment'),
+
 ]
