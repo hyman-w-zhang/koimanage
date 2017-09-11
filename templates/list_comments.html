@@ -18,13 +18,15 @@
             //var base_create_date_begin = ($('#create_date_begin').val() || '1970-01-01')+ ' 00:00:00';
             //var base_create_date_end = ($('#create_date_end').val() || '9999-12-31') + ' 23:59:59';
             var page_size = $('#page_size_select').val() || 10;
+            var msg_res = $('#msg_res').val() || '0';
 
             $.ajax({
                 'url' : '/comment/retrieve',
                 'type' : 'POST',
                 'data' : {
                     'page': page || 1,
-                    'page_size': page_size
+                    'page_size': page_size,
+                    'res': msg_res
                 },
                 'dataType' : 'json',
                 'content-type' : 'application/json; charset=utf-8',
@@ -39,7 +41,7 @@
             var comments_data = data['messages'];
 
             if (comments_data.length == 0) {
-                $('#comments').html('没有找到相关评论');
+                $('#comments').html('没有找到相关消息');
                 return;
             }
 
@@ -63,9 +65,9 @@
 
                 material_html += '<td><div><span>' + comment.nickname + '</span></div></td>';
 
-                material_html += '<td><div><span>' + comment.created + '</span></div></td>';
+                material_html += '<td><div><span>' + comment.created_str + '</span></div></td>';
 
-                material_html += '<td><div><span>' + comment.message + '</span></div></td>';
+                material_html += '<td><div><span>' + comment.message.substr(0, 255) + (comment.message.length > 255 ? '...' : '') + '</span></div></td>';
 
                 material_html += '<td><div><span>' + comment.ip + '</span></div></td>';
 
@@ -118,7 +120,7 @@
 {% block 'content' %}
     <ol class="breadcrumb">
         <li><a href="{% url 'admin_home' %}">首页</a></li>
-        <li class="active">评论管理</li>
+        <li class="active">消息管理</li>
     </ol>
 
     <form id="form" data-toggle="validator">
@@ -127,8 +129,16 @@
         <div class="form-group col-md-12">
 
             <div class="col-md-4">
+                <label class="col-md-6">消息类型：</label>
+                <select class="col-md-5 select form-leo" id="msg_res" onchange="search_comments();">
+                    <option value="0">作品评论</option>
+                    <option value="1">吐槽反馈</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
                 <label class="col-md-6">每页大小：</label>
-                <select class="col-md-5" id="page_size_select" onchange="search_comments();">
+                <select class="col-md-5 select form-leo" id="page_size_select" onchange="search_comments();">
                     <option value="10">10</option>
                     <option value="20">20</option>
                 </select>

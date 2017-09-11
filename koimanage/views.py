@@ -9,6 +9,7 @@ from wcbp.model import Merchandises
 from wcbp.model import Messages
 from wcbp.model import Users
 from . import versions
+from utils import time_utils
 
 __api_config = ApiConfigs()
 
@@ -188,9 +189,11 @@ def retrieve_comments(request):
     page = int(request.POST.get('page') or '1')
     page_size = int(request.POST.get('page_size') or '10')
     type = request.POST.get('type') or 'type'
-    messages = __messages.list_message(type=type, res='0', page=page, page_size=page_size)
+    res = request.POST.get('res') or '0'
+    messages = __messages.list_message(type=type, res=res, page=page, page_size=page_size)
     for message in messages:
         message['nickname'] = __users.from_id(id=message['form'])['nikename']
+        message['created_str'] = time_utils.milli_second_time_stamp_to_str(message['created'])
     data = {'messages': messages, 'pages': [1, 2] + [i for i in range(max(3, page), 3 + max(3, page))], 'page': page}
     return JsonResponse(data, safe=False)
 
