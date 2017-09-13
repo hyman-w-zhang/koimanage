@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+    <style>
+        #paging > a {
+            padding: 0 10px;
+        }
+        #paging > span {
+            padding: 0 10px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            $('#created_start').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            $('#created_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+        });
+
+        var curPage = 1;
+
+        function search_next_page(){
+        }
+
+        function search_pay_journals(page){
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
+            var page_size = $('#page_size_select').val() || 10;
+
+            var merchandise_id = $('#merchandise_id').val();
+
+            var params = {
+                'page': page || 1,
+                'page_size': page_size,
+                'created_start': created_start,
+                'created_end': created_end
+            }
+            if (merchandise_id) {
+                params['merchandise_id'] = merchandise_id;
+            }
+
+            $.ajax({
+                'url' : '{% url "retrieve_pay_journals" %}',
+                'type' : 'POST',
+                'data' : params,
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_pay_journals_data(data);
+                }
+            });
+        }
+
+        function update_pay_journals_data(data){
+
+            var pay_journals_data = data['pay_journals'];
+
+            if (pay_journals_data.length == 0) {
+                $('#pay_journals').html('没有找到相关充值记录');
+                $('#pagingWrapper').hide();
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>充值记录</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="10%">用户名</th>';
+            material_html += '<th width="25%">手机号/设备号</th>';
+            material_html += '<th width="15%">订单时间</th>';
+            material_html += '<th width="10%">支付方式</th>';
+            material_html += '<th width="15%">订单号</th>';
+            material_html += '<th width="5%">订单金额</th>';
+            material_html += '<th width="5%">锦币</th>';
+            material_html += '<th width="10%">第三方订单号</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            var pay_type_dict = {'iap': '苹果支付', 'wechat': '微信支付', 'alipay': '支付宝'};
+            var other_pay_type = '其他';
+            pay_journals_data.forEach(function(pay_journal) {
+
+                material_html += '<tr id="pay_journal_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="pay_journal_id_' + i + '" value="' + pay_journal.id + '"></td>';
+
+                material_html += '<td><div><span>' + (pay_journal.user_nickname || '') + '</span></div></td>';
+
+                material_html += '<td><div><span>' + (pay_journal.user_tel || '') + '</span></div></td>';
+
+                material_html += '<td><div><span>' + pay_journal.pay_time_str + '</span></div></td>';
+
+                material_html += '<td><div><span>' + (pay_type_dict[pay_journal.pay_type] || other_pay_type) + '</span></div></td>';
+
+                material_html += '<td><div><span>' + pay_journal.order_id + '</span></div></td>';
+                material_html += '<td><div><span>&#65509;' + (pay_journal.price / 100.0).toFixed(2) + '</span></div></td>';
+                material_html += '<td><div><span>' + pay_journal.merchandise_name + '</span></div></td>';
+                material_html += '<td><div><span>' + (pay_journal.third_id || '') + '</span></div></td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#pay_journals').html(material_html);
+
+            var paging_html = '<span>共找到' + data['total'] + '条记录, 每页' + data['page_size'] + '条, 共' + data['max_page'] + '页</span>';
+            for(var i = 0; i < data['pages'].length; i++) {
+                if (data['pages'][i] != '...' && data['pages'][i] != data['page']) {
+                    paging_html += '<a href="javascript:search_pay_journals(' + "'" + data['pages'][i] + "'" + ');">' + data['pages'][i] + '</a>';
+                } else {
+                    paging_html += '<span>' + data['pages'][i] + '</span>';
+                }
+            }
+            $('#paging').html(paging_html);
+            $('#pagingWrapper').show();
+        }
+
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">充值管理</li>
+    </ol>
+
+    <form id="form" data-toggle="validator">
+        {% csrf_token %}
+
+        <div class="form-group col-md-12">
+
+            <!--<div class="col-md-3">-->
+                <!--<label class="col-md-4">手机：</label>-->
+                <!--<input type="text" id="tel" name="tel" class="col-mod-7 form-leo add-clear">-->
+            <!--</div>-->
+            <!--<div class="col-md-3">-->
+                <!--<label class="col-md-4">用户名：</label>-->
+                <!--<input type="text" id="nickname" name="nickname" class="col-mod-7 form-leo add-clear">-->
+            <!--</div>-->
+
+            <div class="col-md-4">
+                <label class="col-md-3">商品名称：</label>
+                <select class="col-md-5 select form-leo" id="merchandise_id" name="merchandise_id">
+                    <option value="">全部</option>
+                    {% for merchandise in merchandises %}
+                    <option value="{{ merchandise.id }}">{{ merchandise.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="col-md-3">日期</label>
+                <input type="text" id="created_start" name="created_start" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+                <span class="col-md-1 center">_</span>
+                <input type="text" id="created_end" name="created_end" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="search-pay_journal" class="btn btn-md btn-primary" onclick="search_pay_journals();">查找</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div id="pay_journals"></div>
+
+    <div id="pagingWrapper" style="display: none;">
+
+        <div class="col-md-3">
+            <label class="col-md-4">每页大小：</label>
+            <select class="col-md-6 select form-leo" id="page_size_select" onchange="search_pay_journals();">
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+
+        <div id="paging" class="col-mod-9">
+
+            <!--<span>页码:</span>-->
+            <!--<a href="javascript:search_pay_journals('1');" >首页</a>-->
+            <!--<a href="javascript:search_pay_journals('1');" >1</a>-->
+            <!--<a href="javascript:search_pay_journals('2');" >2</a>-->
+            <!--<a href="javascript:search_pay_journals('3');" >3</a>-->
+            <!--<a href="javascript:search_pay_journals('4');" >4</a>-->
+            <!--<a href="javascript:search_pay_journals('5');" >5</a>-->
+            <!--<span>...</span>-->
+            <!--<a href="javascript:search_pay_journals('2');" >下一页</a>-->
+        </div>
+    </div>
+
+{% endblock %}

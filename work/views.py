@@ -9,11 +9,13 @@ from wcbp.common.dict_object import DictObject
 from wcbp.model import Works
 from wcbp.model import Templates
 from wcbp.model import WorkCategories
+from wcbp.model import Users
 
 
 __works = Works()
 __template = Templates()
 __work_categories = WorkCategories()
+__users = Users()
 
 
 @login_required
@@ -37,6 +39,11 @@ def retrieve_works(request):
     template = template if bool(template) else None
 
     works = __works.retrieve_all(template=template, page_no=page_no, page_size=page_size, created_start=created_start, created_end=created_end)
+    for w in works:
+        author = __users.from_id(w['author'])
+        w['tel'] = author.get('tel', '')
+        w['nickname'] = author.get('nikename', '')
+        w['avatar'] = author.get('cover', '')
     data = {
         'total': __works.count(template=template, created_start=created_start, created_end=created_end),
         'works': works,
@@ -119,6 +126,11 @@ def manage_category_works(request):
     work_category = __work_categories.from_id(id=category_id)
     works_id_list = work_category['works']
     works = __works.from_id_list(works_id_list, sort_as_input=True)
+    for w in works:
+        author = __users.from_id(w['author'])
+        w['tel'] = author.get('tel', '')
+        w['nickname'] = author.get('nikename', '')
+        w['avatar'] = author.get('cover', '')
     return render(request, 'manage_category_works.html', {'works': works, 'category_id': category_id})
 
 
@@ -161,6 +173,10 @@ def retrieve_enable_works(request):
     manual_work_categories = __work_categories.retrieve_manual()
     work_list = list()
     for w in works:
+        author = __users.from_id(w['author'])
+        w['tel'] = author.get('tel', '')
+        w['nickname'] = author.get('nikename', '')
+        w['avatar'] = author.get('cover', '')
         w['categories_names'] = list()
         w['categories_ids'] = list()
         for wc in manual_work_categories:

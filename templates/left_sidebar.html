@@ -69,6 +69,19 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_user">用户管理</a>
+                </h4>
+            </div>
+            <div id="collapse_user" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_users' %}">
+                   查看用户
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_message">消息管理</a>
                 </h4>
             </div>

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+    <style>
+        #paging > a {
+            padding: 0 10px;
+        }
+        #paging > span {
+            padding: 0 10px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            $('#created_start').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            $('#created_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+        });
+
+        var curPage = 1;
+
+        function search_next_page(){
+        }
+
+        function search_users(page){
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
+            var page_size = $('#page_size_select').val() || 10;
+            var tel = $('#tel').val() || '';
+            var nickname = $('#nickname').val() || '';
+
+            $.ajax({
+                'url' : '{% url "retrieve_users" %}',
+                'type' : 'POST',
+                'data' : {
+                    'page': page || 1,
+                    'page_size': page_size,
+                    'created_start': created_start,
+                    'created_end': created_end,
+                    'tel': tel,
+                    'nickname': nickname
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_users_data(data);
+                }
+            });
+        }
+
+        function update_users_data(data){
+
+            var users_data = data['users'];
+
+            if (users_data.length == 0) {
+                $('#users').html('没有找到相关消息');
+                $('#pagingWrapper').hide();
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>评论列表</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="10%">头像</th>';
+            material_html += '<th width="25%">用户名</th>';
+            material_html += '<th width="25%">手机号/设备号</th>';
+            material_html += '<th width="15%">注册时间</th>';
+            material_html += '<th width="10%">操作</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            users_data.forEach(function(user) {
+
+                material_html += '<tr id="user_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="user_id_' + i + '" value="' + user.id + '"></td>';
+
+                material_html += '<td><div><img height="128" src="' + (user.cover || '') + '" /></div></td>';
+
+                material_html += '<td><div><span>' + (user.nickname || '') + '</span></div></td>';
+
+                material_html += '<td><div><span>' + (user.tel || '') + '</span></div></td>';
+
+                material_html += '<td><div><span>' + user.created_str + '</span></div></td>';
+
+
+
+                // actions
+                material_html += '<td><div>';
+
+                material_html += '<div id="delete_' + i + '"><button class="btn btn-md btn-danger">删除</div>';
+
+                material_html += '</div>';
+
+                material_html += '</td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#users').html(material_html);
+
+            var paging_html = '<span>共找到' + data['total'] + '条记录, 每页' + data['page_size'] + '条, 共' + data['max_page'] + '页</span>';
+            for(var i = 0; i < data['pages'].length; i++) {
+                if (data['pages'][i] != '...' && data['pages'][i] != data['page']) {
+                    paging_html += '<a href="javascript:search_users(' + "'" + data['pages'][i] + "'" + ');">' + data['pages'][i] + '</a>';
+                } else {
+                    paging_html += '<span>' + data['pages'][i] + '</span>';
+                }
+            }
+            $('#paging').html(paging_html);
+            $('#pagingWrapper').show();
+        }
+
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">用户管理</li>
+    </ol>
+
+    <form id="form" data-toggle="validator">
+        {% csrf_token %}
+
+        <div class="form-group col-md-12">
+
+            <div class="col-md-3">
+                <label class="col-md-4">手机：</label>
+                <input type="text" id="tel" name="tel" class="col-mod-7 form-leo add-clear">
+            </div>
+            <div class="col-md-3">
+                <label class="col-md-4">用户名：</label>
+                <input type="text" id="nickname" name="nickname" class="col-mod-7 form-leo add-clear">
+            </div>
+
+            <div class="col-md-3">
+                <label class="col-md-3">注册时间</label>
+                <input type="text" id="created_start" name="created_start" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+                <span class="col-md-1 center">_</span>
+                <input type="text" id="created_end" name="created_end" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="search-user" class="btn btn-md btn-primary" onclick="search_users();">查找</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div id="users"></div>
+
+    <div id="pagingWrapper" style="display: none;">
+
+        <div class="col-md-3">
+            <label class="col-md-4">每页大小：</label>
+            <select class="col-md-6 select form-leo" id="page_size_select" onchange="search_users();">
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+
+        <div id="paging" class="col-mod-9">
+
+            <!--<span>页码:</span>-->
+            <!--<a href="javascript:search_users('1');" >首页</a>-->
+            <!--<a href="javascript:search_users('1');" >1</a>-->
+            <!--<a href="javascript:search_users('2');" >2</a>-->
+            <!--<a href="javascript:search_users('3');" >3</a>-->
+            <!--<a href="javascript:search_users('4');" >4</a>-->
+            <!--<a href="javascript:search_users('5');" >5</a>-->
+            <!--<span>...</span>-->
+            <!--<a href="javascript:search_users('2');" >下一页</a>-->
+        </div>
+    </div>
+
+{% endblock %}

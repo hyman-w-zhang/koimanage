@@ -46,11 +46,12 @@
 
             material_html += '<th width="5%">序号</th>';
             material_html += '<th width="15%">作品</th>';
-            material_html += '<th width="10%">作品ID</th>';
-            material_html += '<th width="10%">用户ID</th>';
+            material_html += '<th width="10%">用户名</th>';
+            material_html += '<th width="10%">用户手机号/设备号</th>';
             material_html += '<th width="20%">上传时间</th>';
-            material_html += '<th width="10%">状态</th>';
+            material_html += '<th width="10%">播放次数</th>';
             material_html += '<th width="10%">被举报次数</th>';
+            material_html += '<th width="10%">状态</th>';
             material_html += '<th width="10%">操作</th>';
             material_html += '</tr></thead><tbody>';
             var i = 1;
@@ -69,15 +70,19 @@
                 material_html += '<span style="position:relative;padding-left:30px;">尺寸：' + work.width + ' <b>x</b> ' + work.height + '</span>';
                 material_html += '</span></div></td>';
 
-                material_html += '<td><div><span>' + work.id + '</span></div></td>';
+                //material_html += '<td><div><span>' + work.id + '</span></div></td>';
 
-                 material_html += '<td><div><span>' + work.author + '</span></div></td>';
+                //material_html += '<td><div><span>' + work.author + '</span></div></td>';
 
-                material_html += '<td><div><span>' + work.created + '</span></div></td>';
+                material_html += '<td><div><span>' + work.nickname + '</span></div></td>';
+                material_html += '<td><div><span>' + work.tel + '</span></div></td>';
 
-                material_html += '<td><div><span>' + (work.status == 'enable' ? '启用' : '审核下架') + '</span></div></td>';
+                material_html += '<td><div><span>' + work.created.substr(0, 19) + '</span></div></td>';
 
+                material_html += '<td><div><span>' + (work.pv) + '</span></div></td>';
                 material_html += '<td><div><span>' + (work.report) + '</span></div></td>';
+
+                material_html += '<td><div><span>' + (work.status == 'enable' ? '已发布' : '审核下架') + '</span></div></td>';
 
                 // actions
                 material_html += '<td><div>';
