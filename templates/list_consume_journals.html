@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+    <style>
+        #paging > a {
+            padding: 0 10px;
+        }
+        #paging > span {
+            padding: 0 10px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+            $('#created_start').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            $('#created_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+        });
+
+        var curPage = 1;
+
+        function search_next_page(){
+        }
+
+        function update_props() {
+        }
+
+        function search_consume_journals(page){
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
+            var page_size = $('#page_size_select').val() || 10;
+
+            var merchandise_id = $('#merchandise_id').val();
+
+            var params = {
+                'page': page || 1,
+                'page_size': page_size,
+                'created_start': created_start,
+                'created_end': created_end
+            }
+            if (merchandise_id) {
+                params['merchandise_id'] = merchandise_id;
+            }
+
+            $.ajax({
+                'url' : '{% url "retrieve_consume_journals" %}',
+                'type' : 'POST',
+                'data' : params,
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    update_consume_journals_data(data);
+                }
+            });
+        }
+
+        function update_consume_journals_data(data){
+
+            var consume_journals_data = data['consume_journals'];
+
+            if (consume_journals_data.length == 0) {
+                $('#consume_journals').html('没有找到相关充值记录');
+                $('#pagingWrapper').hide();
+                return;
+            }
+
+            var material_html = '<table class="table"><caption>消费记录</caption><thead><tr>';
+
+            material_html += '<th width="5%">序号</th>';
+            material_html += '<th width="10%">用户名</th>';
+            material_html += '<th width="25%">手机号/设备号</th>';
+            material_html += '<th width="20%">消费时间</th>';
+            material_html += '<th width="10%">道具类型</th>';
+            material_html += '<th width="20%">道具名称</th>';
+            material_html += '<th width="10%">锦币</th>';
+            material_html += '</tr></thead><tbody>';
+            var i = 1;
+            var props_dict = {'template': '模板'};
+            var other_prop_type = '其他';
+            consume_journals_data.forEach(function(consume_journal) {
+
+                material_html += '<tr id="consume_journal_' + i + '">';
+
+                material_html += '<td><div>';
+                material_html += i + '</div><input type="hidden" id="consume_journal_id_' + i + '" value="' + consume_journal.id + '"></td>';
+
+                material_html += '<td><div><span>' + (consume_journal.user_nickname || '') + '</span></div></td>';
+
+                material_html += '<td><div><span>' + (consume_journal.user_tel || '') + '</span></div></td>';
+
+                material_html += '<td><div><span>' + consume_journal.created_str + '</span></div></td>';
+
+                material_html += '<td><div><span>' + (props_dict[consume_journal.merchandise_type] || other_prop_type) + '</span></div></td>';
+
+                material_html += '<td><div><span>' + consume_journal.merchandise_name + '</span></div></td>';
+
+                material_html += '<td><div><span>' + consume_journal.coin + '</span></div></td>';
+
+                material_html += '</tr>';
+
+                i++;
+            });
+            material_html += '</tbody></table>';
+            $('#consume_journals').html(material_html);
+
+            var paging_html = '<span>共找到' + data['total'] + '条记录, 每页' + data['page_size'] + '条, 共' + data['max_page'] + '页</span>';
+            for(var i = 0; i < data['pages'].length; i++) {
+                if (data['pages'][i] != '...' && data['pages'][i] != data['page']) {
+                    paging_html += '<a href="javascript:search_consume_journals(' + "'" + data['pages'][i] + "'" + ');">' + data['pages'][i] + '</a>';
+                } else {
+                    paging_html += '<span>' + data['pages'][i] + '</span>';
+                }
+            }
+            $('#paging').html(paging_html);
+            $('#pagingWrapper').show();
+        }
+
+
+    </script>
+
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">充值管理</li>
+    </ol>
+
+    <form id="form" data-toggle="validator">
+        {% csrf_token %}
+
+        <div class="form-group col-md-12">
+
+            <div class="col-md-2">
+                <label class="col-md-5">道具类型：</label>
+                <select class="col-md-6 select form-leo" id="merchandise_type" name="merchandise_type" onchange="update_props();">
+                    <option value="">全部</option>
+                    {% for merchandise_type in merchandise_types %}
+                    <option value="{{ merchandise_type.id }}">{{ merchandise_type.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="col-md-3">道具名称：</label>
+                <select class="col-md-7 select form-leo" id="merchandise_id" name="merchandise_id">
+                    <option value="">全部</option>
+                    {% for merchandise in merchandises %}
+                    <option value="{{ merchandise.id }}">{{ merchandise.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="col-md-3">日期</label>
+                <input type="text" id="created_start" name="created_start" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+                <span class="col-md-1 center">_</span>
+                <input type="text" id="created_end" name="created_end" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+            </div>
+
+            <div class="col-md-2">
+                <button type="button" id="search-consume_journal" class="btn btn-md btn-primary" onclick="search_consume_journals();">查找</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div id="consume_journals"></div>
+
+    <div id="pagingWrapper" style="display: none;">
+
+        <div class="col-md-3">
+            <label class="col-md-4">每页大小：</label>
+            <select class="col-md-6 select form-leo" id="page_size_select" onchange="search_consume_journals();">
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+
+        <div id="paging" class="col-mod-9">
+
+        </div>
+    </div>
+
+{% endblock %}

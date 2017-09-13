@@ -82,6 +82,22 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_recharge_consume">充值消费</a>
+                </h4>
+            </div>
+            <div id="collapse_recharge_consume" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_pay_journals' %}">
+                   充值记录
+                </div>
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_consume_journals' %}">
+                   消费记录
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_message">消息管理</a>
                 </h4>
             </div>
