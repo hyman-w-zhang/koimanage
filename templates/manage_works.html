@@ -1,16 +1,26 @@
 {% extends 'base.html' %}
 
 {% block 'custom_js' %}
+
+    <style>
+        #paging > a {
+            padding: 0 10px;
+        }
+        #paging > span {
+            padding: 0 10px;
+        }
+    </style>
+
     <script type="text/javascript">
         $(document).ready(function(){
             $('#create_date_begin').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
             $('#create_date_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
         });
 
-        function search_works(){
+        function search_works(page){
             var base_create_date_begin = ($('#create_date_begin').val() || '1970-01-01')+ ' 00:00:00';
             var base_create_date_end = ($('#create_date_end').val() || '9999-12-31') + ' 23:59:59';
-            var page = $('#page_select').val() || 1;
+            page = page || 1;
             var page_size = $('#page_size_select').val() || 10;
             var template = $('#template').val();
 
@@ -104,16 +114,16 @@
             material_html += '</tbody></table>';
             $('#works').html(material_html);
 
-            var total_count = data.total || bases_data.length;
-            var total_page = Math.ceil(total_count / page_size);
-            $('#paging').show();
-            var page_select = document.getElementById('page_select');
-            page_select.options.length = 0;
-            for(var i = 1; i <= total_page; i++) {
-                page_select.options.add(new Option(i, i));
+            var paging_html = '<span>共找到' + data['total'] + '条记录, 每页' + data['page_size'] + '条, 共' + data['max_page'] + '页</span>';
+            for(var i = 0; i < data['pages'].length; i++) {
+                if (data['pages'][i] != '...' && data['pages'][i] != data['page']) {
+                    paging_html += '<a href="javascript:search_works(' + "'" + data['pages'][i] + "'" + ');">' + data['pages'][i] + '</a>';
+                } else {
+                    paging_html += '<span>' + data['pages'][i] + '</span>';
+                }
             }
-            page_select.options[page - 1].selected = true;
-            $('#paging_info').html('<span>共找到条<b>' + total_count + '</b>记录。 每页<b>' + page_size + '</b>条，共<b>' + total_page + '</b>页<input type="hidden" id="total_page" value="' + total_page + '"/></span>');
+            $('#paging').html(paging_html);
+            $('#pagingWrapper').show();
         }
 
         function audit_work(index){
@@ -125,7 +135,7 @@
                 success : function(data) {
                     if (data.code == 0) {
                         //$('#work_' + index).remove();
-                        search_works();
+                        search_works('1');
                     } else {
                         alert(data.msg);
                     }
@@ -141,7 +151,7 @@
                 'dataType' : 'json',
                 success : function(data) {
                     if (data.code == 0) {
-                        search_works();
+                        search_works('1');
                     } else {
                         alert(data.msg);
                     }
@@ -163,9 +173,9 @@
     <form id="form" data-toggle="validator">
         {% csrf_token %}
 
-        <div class="form-group col-md-12">
-            <div class="col-md-4"><a class="btn btn-primary" href="{% url 'recommend_works' %}">查看推荐作品</a> </div>
-        </div>
+        <!--<div class="form-group col-md-12">-->
+            <!--<div class="col-md-4"><a class="btn btn-primary" href="{% url 'recommend_works' %}">查看推荐作品</a> </div>-->
+        <!--</div>-->
 
         <div class="form-group col-md-12">
             <div class="col-md-4">
@@ -186,23 +196,27 @@
             </div>
 
             <div class="col-md-1">
-                <button type="button" id="search-works" class="btn btn-md btn-primary" onclick="search_works();">查找</button>
+                <button type="button" id="search-works" class="btn btn-md btn-primary" onclick="search_works('1');">查找</button>
             </div>
         </div>
 
     </form>
     <div>
         <div id="works"></div>
-        <div id="paging" style="display:none;">
-            <label class="col-md-1">每页大小：</label>
-            <select class="col-md-1" id="page_size_select" onchange="search_works();">
-                <option value="10">10</option>
-                <option value="20">20</option>
-            </select>
-            <label class="col-md-1">页码：</label>
-            <select class="col-md-1" id='page_select' onchange="search_works();">
-            </select>
-            <div id="paging_info" class="col-md-6"></div>
+
+        <div id="pagingWrapper" style="display: none;">
+
+            <div class="col-md-3">
+                <label class="col-md-4">每页大小：</label>
+                <select class="col-md-6 select form-leo" id="page_size_select" onchange="search_works('1');">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+
+            <div id="paging" class="col-mod-9">
+
+            </div>
         </div>
     </div>
 

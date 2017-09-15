@@ -10,6 +10,7 @@ from wcbp.model import Works
 from wcbp.model import Templates
 from wcbp.model import WorkCategories
 from wcbp.model import Users
+from utils import page_utils
 
 
 __works = Works()
@@ -44,8 +45,14 @@ def retrieve_works(request):
         w['tel'] = author.get('tel', '')
         w['nickname'] = author.get('nikename', '')
         w['avatar'] = author.get('cover', '')
+    total = __works.count(template=template, created_start=created_start, created_end=created_end)
+    max_page = (total + page_size - 1) // page_size
     data = {
-        'total': __works.count(template=template, created_start=created_start, created_end=created_end),
+        'total': total,
+        'page_size': page_size,
+        'max_page': max_page,
+        'pages': page_utils.pages(start_page=1, cur_page=page_no, max_page=max_page),
+        'page': page_no,
         'works': works,
     }
     return JsonResponse(data, encoder=DictObject.JSONEncoder, safe=False)
@@ -189,8 +196,13 @@ def retrieve_enable_works(request):
         wc['id'] = wc.pop('_id')
         wc_list.append(wc)
 
+    max_page = (total + page_size - 1) // page_size
     data = {
         'total': total,
+        'page_size': page_size,
+        'max_page': max_page,
+        'pages': page_utils.pages(start_page=1, cur_page=page_no, max_page=max_page),
+        'page': page_no,
         'works': work_list,
         'categories': wc_list,
     }
