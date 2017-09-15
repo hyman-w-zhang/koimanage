@@ -13,13 +13,13 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            $('#create_date_begin').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
-            $('#create_date_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            $('#created_start').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
+            $('#created_end').datetimepicker({'format': 'yyyy-mm-dd', 'autoclose': true, 'minView': 2, 'todayBtn': 'linked', 'todayHighlight': true});
         });
 
         function search_works(page){
-            var base_create_date_begin = ($('#create_date_begin').val() || '1970-01-01')+ ' 00:00:00';
-            var base_create_date_end = ($('#create_date_end').val() || '9999-12-31') + ' 23:59:59';
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
             page = page || 1;
             var page_size = $('#page_size_select').val() || 10;
             var template = $('#template').val();
@@ -28,8 +28,8 @@
                 'url' : '/work/retrieve',
                 'type' : 'POST',
                 'data' : {
-                    'base_create_date_begin' : base_create_date_begin,
-                    'base_create_date_end': base_create_date_end,
+                    'created_start' : created_start,
+                    'created_end': created_end,
                     'page': page,
                     'page_size': page_size,
                     'template': template
@@ -122,8 +122,16 @@
                     paging_html += '<span>' + data['pages'][i] + '</span>';
                 }
             }
+            paging_html += '<button class="btn btn-primary" onclick="export_works();">下载</button>';
             $('#paging').html(paging_html);
             $('#pagingWrapper').show();
+        }
+
+        function export_works(){
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
+            var template = $('#template').val();
+            location.href = '{% url "export_works" %}?created_start=' + created_start + '&created_end=' + created_end + '&template=' + template;
         }
 
         function audit_work(index){
@@ -180,9 +188,9 @@
         <div class="form-group col-md-12">
             <div class="col-md-4">
                 <label class="col-md-3">时间</label>
-                <input type="text" id="create_date_begin" name="create_date_begin" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+                <input type="text" id="created_start" name="created_start" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
                 <span class="col-md-1 center">_</span>
-                <input type="text" id="create_date_end" name="create_date_end" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
+                <input type="text" id="created_end" name="created_end" data-date-format="yyyy-mm-dd" class="datetimepicker col-md-3" />
             </div>
 
             <div class="col-md-4">
@@ -198,6 +206,7 @@
             <div class="col-md-1">
                 <button type="button" id="search-works" class="btn btn-md btn-primary" onclick="search_works('1');">查找</button>
             </div>
+
         </div>
 
     </form>

@@ -48,6 +48,14 @@
             });
         }
 
+        function export_users(){
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
+            var tel = $('#tel').val() || '';
+            var nickname = $('#nickname').val() || '';
+            location.href = '{% url "export_users" %}?created_start=' + created_start + '&created_end=' + created_end + '&tel=' + tel + '&nickname=' + nickname;
+        }
+
         function update_users_data(data){
 
             var users_data = data['users'];

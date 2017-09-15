@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     url(r'list$', views.list_work, name='list_works'),
     url(r'retrieve$', views.retrieve_works, name='retrieve_works'),
+    url(r'export_works$', views.export_works, name='export_works'),
     url(r'retrieve_enable$', views.retrieve_enable_works, name='retrieve_enable_works'),
     url(r'audit$', views.audit_work, name='audit_work'),
     url(r'shelve$', views.shelve_work, name='shelve_work'),

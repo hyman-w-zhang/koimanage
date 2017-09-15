@@ -51,6 +51,13 @@
             });
         }
 
+        function export_pay_journals(){
+            var created_start = ($('#created_start').val() || '1970-01-01')+ ' 00:00:00';
+            var created_end = ($('#created_end').val() || '9999-12-31') + ' 23:59:59';
+            var merchandise_id = $('#merchandise_id').val();
+            location.href = '{% url "export_pay_journals" %}?created_start=' + created_start + '&created_end=' + created_end + '&merchandise_id=' + merchandise_id;
+        }
+
         function update_pay_journals_data(data){
 
             var pay_journals_data = data['pay_journals'];
@@ -74,8 +81,6 @@
             material_html += '<th width="10%">第三方订单号</th>';
             material_html += '</tr></thead><tbody>';
             var i = 1;
-            var pay_type_dict = {'iap': '苹果支付', 'wechat': '微信支付', 'alipay': '支付宝'};
-            var other_pay_type = '其他';
             pay_journals_data.forEach(function(pay_journal) {
 
                 material_html += '<tr id="pay_journal_' + i + '">';
@@ -89,7 +94,7 @@
 
                 material_html += '<td><div><span>' + pay_journal.pay_time_str + '</span></div></td>';
 
-                material_html += '<td><div><span>' + (pay_type_dict[pay_journal.pay_type] || other_pay_type) + '</span></div></td>';
+                material_html += '<td><div><span>' + pay_journal.pay_type_str + '</span></div></td>';
 
                 material_html += '<td><div><span>' + pay_journal.order_id + '</span></div></td>';
                 material_html += '<td><div><span>&#65509;' + (pay_journal.price / 100.0).toFixed(2) + '</span></div></td>';
@@ -111,6 +116,7 @@
                     paging_html += '<span>' + data['pages'][i] + '</span>';
                 }
             }
+            paging_html += '<button class="btn btn-primary" onclick="export_pay_journals();">下载</button>';
             $('#paging').html(paging_html);
             $('#pagingWrapper').show();
         }
@@ -178,16 +184,6 @@
         </div>
 
         <div id="paging" class="col-mod-9">
-
-            <!--<span>页码:</span>-->
-            <!--<a href="javascript:search_pay_journals('1');" >首页</a>-->
-            <!--<a href="javascript:search_pay_journals('1');" >1</a>-->
-            <!--<a href="javascript:search_pay_journals('2');" >2</a>-->
-            <!--<a href="javascript:search_pay_journals('3');" >3</a>-->
-            <!--<a href="javascript:search_pay_journals('4');" >4</a>-->
-            <!--<a href="javascript:search_pay_journals('5');" >5</a>-->
-            <!--<span>...</span>-->
-            <!--<a href="javascript:search_pay_journals('2');" >下一页</a>-->
         </div>
     </div>
 
