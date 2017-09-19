@@ -43,6 +43,9 @@ def save_template(request):
     poster = request.FILES.get('poster')
     poster_file_name = upload_material_file.save_poster_file(poster)
 
+    portrait = request.FILES.get('portrait')
+    portrait_file_name = upload_material_file.save_portrait_file(portrait)
+
     video = request.FILES.get('video')
     video_file_name = upload_material_file.save_video_file(video)
     width, height, duration, file_size = upload_material_file.parse_video_info(video_file_name)
@@ -76,7 +79,8 @@ def save_template(request):
                            applicable=applicable,
                            scenario=scenario,
                            difficulty=difficulty,
-                           effect=effect
+                           effect=effect,
+                           portrait=portrait_file_name
                            )
 
     template_category = TemplateCategories()
@@ -113,6 +117,7 @@ def save_modify_template(request):
     video_file_name = None
     thumb_file_name = None
     poster_file_name = None
+    portrait_file_name = None
     width, height, duration, file_size = None, None, None, None
 
     material = request.FILES.get('material')
@@ -126,6 +131,10 @@ def save_modify_template(request):
     poster = request.FILES.get('poster')
     if bool(poster):
         poster_file_name = upload_material_file.save_poster_file(poster)
+
+    portrait = request.FILES.get('portrait')
+    if bool(portrait):
+        portrait_file_name = upload_material_file.save_portrait_file(portrait)
 
     video = request.FILES.get('video')
     if bool(video):
@@ -164,7 +173,8 @@ def save_modify_template(request):
                              applicable=applicable,
                              scenario=scenario,
                              difficulty=difficulty,
-                             effect=effect
+                             effect=effect,
+                             portrait=portrait_file_name
                              )
 
     return HttpResponseRedirect('/template/list')

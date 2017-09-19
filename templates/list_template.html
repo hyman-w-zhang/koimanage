@@ -82,6 +82,7 @@
                     <th width="10%">视频</th>
                     <!--<th>缩略图</th>-->
                     <!--<th>海报</th>-->
+                    <th>海报</th>
                     <th width="10%">标题</th>
                     <th width="15%">描述</th>
                     <th width="10%">类型</th>
@@ -97,9 +98,10 @@
                 {% for template in templates %}
                     <tr>
                         <td><input type="hidden"  value="{{ template.id }}"/>{{ forloop.counter }}</td>
-                        <td class="video"><video height="128px" src="{{ template.video }}"></video></td>
+                        <td class="video"><video height="128px" src="{{ template.video }}" controls poster="{{ template.poster }}"></video></td>
                         <!--<td class="image"><img height="128px" src="{{ template.thumb }}"/></td>-->
                         <!--<td class="image"><img height="128px" src="{{ template.poster }}"/></td>-->
+                        <td class="image"><img height="128px" src="{{ template.portrait }}"/></td>
                         <td>{{ template.title }}</td>
                         <td>{{ template.description }}</td>
                         <td>{{ template.tags }}</td>

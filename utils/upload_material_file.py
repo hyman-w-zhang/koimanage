@@ -11,6 +11,7 @@ material_dir = os.path.join(base_dir, 'zips')
 video_dir = os.path.join(base_dir, 'mp4s')
 thumb_dir = os.path.join(base_dir, 'imgs')
 poster_dir = os.path.join(base_dir, 'imgs')
+portrait_dir = os.path.join(base_dir, 'imgs')
 
 
 def save_file(file_path, file, file_name=None):
@@ -41,6 +42,10 @@ def save_thumb_file(file):
 
 
 def save_poster_file(file):
+    return 'imgs/' + save_file(poster_dir, file)
+
+
+def save_portrait_file(file):
     return 'imgs/' + save_file(poster_dir, file)
 
 
