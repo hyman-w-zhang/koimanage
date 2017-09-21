@@ -8,8 +8,10 @@ from wcbp.model import ApiConfigs
 from wcbp.model import Merchandises
 from wcbp.model import Messages
 from wcbp.model import Users
+from wcbp.model import Banners
 from . import versions
 from utils import time_utils
+from utils import upload_material_file
 
 __api_config = ApiConfigs()
 
@@ -18,6 +20,8 @@ __merchandise = Merchandises()
 __messages = Messages()
 
 __users = Users()
+
+__banners = Banners()
 
 
 @login_required
@@ -204,3 +208,42 @@ def delete_comment(request):
     msg_id = request.GET.get('msg_id')
     __messages.delete_message(uid=user_id, msg_id=msg_id)
     return JsonResponse({'code': 0})
+
+
+@login_required
+def add_banner(request):
+    count = __banners.count() or 0
+    return render(request, 'add_banner.html', {'order': count + 1, 'id': str(ObjectId())})
+
+
+@login_required
+def save_banner(request):
+    order = int(request.POST['order'])
+    link = request.POST['link']
+    id = request.POST['id']
+    cover_file = request.FILES.get('cover_file')
+    cover_file_name = None
+    if bool(cover_file):
+        cover_file_name = upload_material_file.save_poster_file(cover_file)
+    __banners.save_banner(id=id, link=link, cover=cover_file_name, order=order)
+    return HttpResponseRedirect('/banner/list')
+
+
+@login_required
+def list_banner(request):
+    banners = __banners.retrieve()
+    return render(request, 'list_banner.html', {'banners': banners})
+
+
+@login_required
+def disable_banner(request):
+    id = request.GET['id']
+    __banners.update_banner(id, status='disabled')
+    return JsonResponse({'code': 0})
+
+
+@login_required
+def save_banners_order(request):
+    banner_ids = request.POST['ids'].split(',')
+    __banners.save_banners_sort(*banner_ids)
+    return JsonResponse({'code': 0, 'msg': '保存排序成功'})

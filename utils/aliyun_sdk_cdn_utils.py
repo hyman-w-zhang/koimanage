@@ -27,5 +27,8 @@ def push_file_to_cdn(url):
 
 
 if __name__ == '__main__':
-    refresh_cdn('static.wcbp.leomaster.com.cn/html/images/kvbanner_02.png')
-    push_file_to_cdn('static.wcbp.leomaster.com.cn/html/images/kvbanner_02.png')
+    # refresh_cdn('static.wcbp.leomaster.com.cn/html/images/kvbanner_02.png')
+    # push_file_to_cdn('static.wcbp.leomaster.com.cn/html/images/kvbanner_02.png')
+    url = 'static.wcbp.leomaster.com.cn/html/js/leo_video.js'
+    refresh_cdn(url)
+    push_file_to_cdn(url)

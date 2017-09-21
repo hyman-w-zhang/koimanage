@@ -53,6 +53,22 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_banner">Banner管理</a>
+                </h4>
+            </div>
+            <div id="collapse_banner" class="panel-collapse collapse">
+                <div class="accordion-inner panel-body ripple" href="{% url 'list_banner' %}">
+                   查看Banner
+                </div>
+                <div class="accordion-inner panel-body ripple" href="{% url 'add_banner' %}">
+                   添加Banner
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion1" href="#collapse_merchandise">商品管理</a>
                 </h4>
             </div>

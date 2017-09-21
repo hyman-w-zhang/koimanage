@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block 'custom_js' %}
+
+    <script>
+        $('document').ready(function(){
+            $('table tbody').sortable({'revert': true});
+        });
+
+        function save_sort(){
+            var sorted_data = $('tr.ui-sortable-handle td input');
+            var sorted_ids = [];
+            for(var i = 0; i < sorted_data.length; i++) {
+                sorted_ids.push(sorted_data[i].value);
+            }
+            $.ajax({
+                'url' : '/banner/save_banners_order',
+                'type' : 'POST',
+                'data' : {
+                    'ids': sorted_ids.join(',')
+                },
+                'dataType' : 'json',
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    alert(data.msg);
+                    location.href = 'javascript:location.reload();';
+                }
+            });
+        }
+
+        function disable_banner(index){
+            var id = $('#banner_id_' + index).val();
+            $.ajax({
+                'url' : '/banner/disable?id=' + id,
+                'content-type' : 'application/json; charset=utf-8',
+                success : function(data) {
+                    if (data.code == 0) {
+                        $('#banner_wrapper_' + index).hide();
+                    } else {
+                        alert(data.msg);
+                    }
+                }
+            });
+        }
+
+    </script>
+
+{% endblock %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">Banner管理</li>
+    </ol>
+
+    <div class="form-group">
+        <div class="col-md-2">
+            <a href="{% url 'add_banner' %}" class="btn btn-success">添加</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <caption>Banner列表</caption>
+        <thead>
+            <tr>
+                <th width="10%">序号</th>
+                <th width="20%">海报</th>
+                <th width="40%">链接</th>
+                <th width="20%">添加日期</th>
+                <th width="10%">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for banner in banners %}
+            <tr id="banner_wrapper_{{ forloop.counter }}">
+                <td id="banner_{{ forloop.counter }}">
+                    <div>{{ forloop.counter }}</div>
+                    <input type="hidden"  id="banner_id_{{ forloop.counter }}" value="{{ banner.id }}"/>
+                </td>
+
+                <td><div><img src="{{ banner.cover }}" height="128"/></div></td>
+
+                <td><div><span><a href="{{ banner.link }}">{{ banner.link }}</a></span></div></td>
+
+                <td><div><span>{{ banner.created }}</span></div></td>
+
+                <td>
+                    <div>
+                        <div style="display:inline;">
+                            <button class="btn btn-md btn-danger" onclick="disable_banner({{ forloop.counter }});">禁用</button>
+                        </div>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="center">
+        <button type="button" id="save-sort" class="btn btn-md btn-primary" onclick="save_sort();">保存排序</button>
+    </div>
+
+{% endblock %}

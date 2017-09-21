@@ -50,4 +50,10 @@ urlpatterns = [
     url(r'^comment/retrieve', view=views.retrieve_comments, name='retrieve_comments'),
     url(r'^comment/delete', view=views.delete_comment, name='delete_comment'),
 
+    url(r'^banner/add', view=views.add_banner, name='add_banner'),
+    url(r'^banner/list', view=views.list_banner, name='list_banner'),
+    url(r'^banner/save$', view=views.save_banner, name='save_banner'),
+    url(r'^banner/save_banners_order$', view=views.save_banners_order, name='save_banners_order'),
+    url(r'^banner/disable', view=views.disable_banner, name='disable_banner'),
+
 ]
