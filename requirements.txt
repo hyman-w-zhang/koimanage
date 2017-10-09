@@ -10,5 +10,5 @@ redis==2.10.5
 mongoalchemy==0.21
 django-bootstrap3==9.0.0
 openpyxl==2.4.8
-aliyun-python-sdk-core-v3==2.3.7
-aliyun-python-sdk-cdn==2.6.0
+aliyun-python-sdk-core-v3==2.4.4
+aliyun-python-sdk-cdn==2.6.1
