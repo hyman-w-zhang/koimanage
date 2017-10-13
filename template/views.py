@@ -215,7 +215,7 @@ def add_template_category(request):
 @login_required
 def save_template_category(request):
     name = request.POST.get('name')
-    order = request.POST.get('order')
+    order = int(request.POST.get('order'))
     __template_categories.save_category(name=name, order=order)
     return HttpResponseRedirect('/template/list_template_categories')
 

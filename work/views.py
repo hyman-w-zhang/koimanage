@@ -200,10 +200,10 @@ def retrieve_enable_works(request):
     created_start, created_end = None, None
     created_start_str = request.POST.get('created_start', '')
     if created_start_str:
-        created_start = datetime.datetime.strptime(created_start_str, 'yyyy-MM-dd')
+        created_start = datetime.datetime.strptime(created_start_str, '%Y-%m-%d %H:%M:%S')
     created_end_str = request.POST.get('created_end', '')
     if created_end_str:
-        created_end = datetime.datetime.strptime(created_end_str, 'yyyy-MM-dd')
+        created_end = datetime.datetime.strptime(created_end_str, '%Y-%m-%d %H:%M:%S')
     template = request.POST.get('template', None)
     template = template if bool(template) else None
 
