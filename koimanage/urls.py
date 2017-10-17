@@ -56,4 +56,12 @@ urlpatterns = [
     url(r'^banner/save_banners_order$', view=views.save_banners_order, name='save_banners_order'),
     url(r'^banner/disable', view=views.disable_banner, name='disable_banner'),
 
+    url(r'^index_ad/list', view=views.retrieve_index_ads, name='list_index_ad'),
+    url(r'^index_ad/save_modified', view=views.save_modified_index_ad, name='save_modified_index_ad'),
+    url(r'^index_ad/modify/([\w\-]+)', view=views.modify_index_ad, name='modify_index_ad'),
+
+    url(r'^activity/list', view=views.retrieve_activities, name='list_activity'),
+    url(r'^activity/save_modified', view=views.save_modified_activity, name='save_modified_activity'),
+    url(r'^activity/modify/([\w\-]+)', view=views.modify_activity, name='modify_activity'),
+
 ]

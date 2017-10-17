@@ -9,6 +9,10 @@ from wcbp.model import Merchandises
 from wcbp.model import Messages
 from wcbp.model import Users
 from wcbp.model import Banners
+from wcbp.model import TemplateCategories
+from wcbp.model import WorkCategories
+from wcbp.model import IndexAds
+from wcbp.model import Activities
 from . import versions
 from utils import time_utils
 from utils import upload_material_file
@@ -22,6 +26,11 @@ __messages = Messages()
 __users = Users()
 
 __banners = Banners()
+
+__template_categories = TemplateCategories()
+__work_categories = WorkCategories()
+__index_ads = IndexAds()
+__activities = Activities()
 
 
 @login_required
@@ -247,3 +256,129 @@ def save_banners_order(request):
     banner_ids = request.POST['ids'].split(',')
     __banners.save_banners_sort(*banner_ids)
     return JsonResponse({'code': 0, 'msg': '保存排序成功'})
+
+
+@login_required
+def retrieve_index_ads(request):
+    return render(request, 'list_index_ad.html', {
+        'index_ads': __index_ads.retrieve()
+    })
+
+
+@login_required
+def modify_index_ad(request, _id):
+    index_ad = __index_ads.from_id(_id)
+    link_types = [
+        {'code': 0, 'name': '外链'},
+        {'code': 1, 'name': '首页其他TAB'},
+        {'code': 2, 'name': '模板页指定TAB'},
+    ]
+    link_pages = [
+        {'code': -1, 'name': '外链'},
+        {'code': 0, 'name': '首页'},
+        {'code': 1, 'name': '模板'},
+    ]
+    wc_list = __work_categories.retrieve()
+    work_categories = list()
+    for wc in wc_list:
+        work_categories.append({'id': str(wc['_id']), 'name': wc['name']})
+
+    tc_list = __template_categories.retrieve()
+    template_categories = list()
+    for tc in tc_list:
+        template_categories.append({'id': str(tc['_id']), 'name': tc['name']})
+
+    return render(request, 'modify_index_ad.html', {
+        **index_ad,
+        'link_types': link_types,
+        'link_pages': link_pages,
+        'work_categories': work_categories,
+        'template_categories': template_categories,
+    })
+
+
+@login_required
+def save_modified_index_ad(request):
+    id = request.POST['id']
+    cover_file = request.FILES.get('cover_file')
+    cover_file_name = None
+    if bool(cover_file):
+        cover_file_name = upload_material_file.save_poster_file(cover_file)
+    link_type = int(request.POST['link_type'])
+    link_tab = ''
+    link_page = int(request.POST.get('link_page'))
+    link = ''
+    if link_type == 0:
+        link = request.POST['link']
+    elif link_type == 1:
+        link_tab = request.POST.get('work_category')
+        link = 'javascript:locate_to_category("{link_tab}");'.format(link_tab=link_tab)
+    elif link_type == 2:
+        link_tab = request.POST.get('template_category')
+        link = 'javascript:locate_to_tab_and_category("{link_page}","{link_tab}");'.format(link_page=link_page, link_tab=link_tab)
+
+    __index_ads.update_index_ad(id, cover=cover_file_name, link=link, link_page=link_page, link_tab=link_tab, link_type=link_type)
+    return HttpResponseRedirect('/index_ad/list')
+
+
+@login_required
+def retrieve_activities(request):
+    return render(request, 'list_activity.html', {
+        'activities': __activities.retrieve()
+    })
+
+
+@login_required
+def modify_activity(request, _id):
+    activity = __activities.from_id(_id)
+    link_types = [
+        {'code': 0, 'name': '外链'},
+        {'code': 1, 'name': '首页其他TAB'},
+        {'code': 2, 'name': '模板页指定TAB'},
+    ]
+    link_pages = [
+        {'code': -1, 'name': '外链'},
+        {'code': 0, 'name': '首页'},
+        {'code': 1, 'name': '模板'},
+    ]
+    wc_list = __work_categories.retrieve()
+    work_categories = list()
+    for wc in wc_list:
+        work_categories.append({'id': str(wc['_id']), 'name': wc['name']})
+
+    tc_list = __template_categories.retrieve()
+    template_categories = list()
+    for tc in tc_list:
+        template_categories.append({'id': str(tc['_id']), 'name': tc['name']})
+
+    return render(request, 'modify_activity.html', {
+        **activity,
+        'link_types': link_types,
+        'link_pages': link_pages,
+        'work_categories': work_categories,
+        'template_categories': template_categories,
+    })
+
+
+@login_required
+def save_modified_activity(request):
+    id = request.POST['id']
+    cover_file = request.FILES.get('cover_file')
+    cover_file_name = None
+    if bool(cover_file):
+        cover_file_name = upload_material_file.save_poster_file(cover_file)
+    link_type = int(request.POST['link_type'])
+    link_tab = ''
+    link_page = int(request.POST.get('link_page'))
+    link = ''
+    if link_type == 0:
+        link = request.POST['link']
+    elif link_type == 1:
+        link_tab = request.POST.get('work_category')
+        link = 'javascript:locate_to_category("{link_tab}");'.format(link_tab=link_tab)
+    elif link_type == 2:
+        link_tab = request.POST.get('template_category')
+        link = 'javascript:locate_to_tab_and_category("{link_page}","{link_tab}");'.format(link_page=link_page, link_tab=link_tab)
+
+    __activities.update_activity(id, cover=cover_file_name, link=link, link_page=link_page, link_tab=link_tab, link_type=link_type)
+    return HttpResponseRedirect('/activity/list')

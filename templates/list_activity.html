@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li class="active">活动配置</li>
+    </ol>
+
+    <div>
+        <table class="table">
+            <caption>配置列表</caption>
+            <thead>
+                <tr>
+                    <th>图片</th>
+                    <th>链接</th>
+                    <th>类型</th>
+                    <th>页面</th>
+                    <th>TAB</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                    <tr>
+                        <td>
+                            <img src="{{ activity.cover }}" height="128"/>
+                        </td>
+                        <td>
+                            <span>{{ activity.link }}</span>
+                        </td>
+                        <td>
+                            <span>{{ activity.link_type }}</span>
+                        </td>
+                        <td>
+                            <span>{{ activity.link_page }}</span>
+                        </td>
+                        <td>
+                            <span>{{ activity.link_tab }}</span>
+                        </td>
+
+                        <td>
+                            <a href="/activity/modify/{{ activity.id }}" class="btn btn-primary">修改</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block 'content' %}
+    <ol class="breadcrumb">
+        <li><a href="{% url 'admin_home' %}">首页</a></li>
+        <li><a href="{% url 'list_index_ad' %}">插屏广告管理</a></li>
+        <li class="active">修改</li>
+    </ol>
+    <form action="{% url 'save_modified_index_ad' %}" role="form" method="post" enctype="multipart/form-data" data-toggle="validator">
+        {% csrf_token %}
+        <input type="hidden" id="id" name="id" value="{{ id }}">
+        <div class="form-group">
+            <label>图片：</label>
+            <input type="file" id="cover_file" name="cover_file" class="form-leo" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>链接类型</label>
+            <select id="link_type" name="link_type" class="select form-control">
+                {% for lt in link_types %}
+                    {% if lt.code == link_type %}
+                        <option value="{{ lt.code }}" selected="selected">{{ lt.name }}</option>
+                    {% else %}
+                        <option value="{{ lt.code }}" >{{ lt.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>链接：</label>
+            <input type="text" id="link" name="link" class="form-control add-clear" maxlength="1024" value="{{ link }}">
+        </div>
+        <div class="form-group">
+            <label>跳转页面</label>
+            <select id="link_page" name="link_page" class="select form-control" required>
+                {% for lp in link_pages %}
+                    {% if lp.code == link_page %}
+                        <option value="{{ lp.code }}" selected="selected">{{ lp.name }}</option>
+                    {% else %}
+                        <option value="{{ lp.code }}" >{{ lp.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>首页TAB</label>
+            <select id="work_category" name="work_category" class="select form-control">
+                <option value="" >无</option>
+                {% for work_category in work_categories %}
+                    {% if work_category.id == link_tab %}
+                        <option value="{{ work_category.id }}" selected="selected">{{ work_category.name }}</option>
+                    {% else %}
+                        <option value="{{ work_category.id }}" >{{ work_category.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>模板TAB</label>
+            <select id="template_category" name="template_category" class="select form-control">
+                <option value="" >无</option>
+                {% for template_category in template_categories %}
+                    {% if template_category.id == link_tab %}
+                        <option value="{{ template_category.id }}" selected="selected">{{ template_category.name }}</option>
+                    {% else %}
+                        <option value="{{ template_category.id }}" >{{ template_category.name }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="center">
+            <button type="submit" class="btn btn-default">提交</button>
+        </div>
+    </form>
+
+    <script>
+        function check_link_type() {
+            if($('#link_type').val() == '0') {
+                $('#link').attr('required', true);
+                $('#link').removeAttr('readOnly');
+                $('#link_page').val('-1');
+                $('#link_page').attr('readOnly', 'readOnly');
+                $('#work_category').val('');
+                $('#template_category').val('');
+                $('#work_category').removeAttr('required');
+                $('#work_category').attr('readOnly', 'readOnly');
+                $('#template_category').removeAttr('required');
+                $('#template_category').attr('readOnly', 'readOnly');
+            } else if($('#link_type').val() == '1') {
+                $('#link').removeAttr('required');
+                $('#link').attr('readOnly', 'readOnly');
+                $('#link').val('');
+                $('#link').removeAttr('required');
+                $('#link_page').attr('required', true);
+                $('#link_page').val('0');
+                $('#link_page').attr('readOnly', 'readOnly');
+                $('#work_category').attr('required', true);
+                $('#work_category').removeAttr('readOnly');
+                $('#template_category').removeAttr('required');
+                $('#template_category').val('');
+                $('#template_category').attr('readOnly', 'readOnly');
+            } else if($('#link_type').val() == '2') {
+                $('#link').removeAttr('required');
+                $('#link').attr('readOnly', 'readOnly');
+                $('#link').val('');
+                $('#link_page').attr('required', true);
+                $('#link_page').val('1');
+                $('#link_page').attr('readOnly', 'readOnly');
+                $('#work_category').removeAttr('required');
+                $('#work_category').val('');
+                $('#work_category').attr('readOnly', 'readOnly');
+                $('#template_category').attr('required', true);
+                $('#template_category').removeAttr('readOnly');
+            }
+        }
+
+        $('#link_type').change(function(){
+            check_link_type();
+        });
+
+        $(document).ready(function(){
+            check_link_type();
+        });
+    </script>
+
+{% endblock %}
