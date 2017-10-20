@@ -83,7 +83,7 @@
                 </td>
                 
                 <td>
-                    <a href="{{ work.video }}" target="_blank"><video height="128" src="{{ work.video }}" poster="{{ work.poster }}" loop="loop"></video></a>
+                    <a href="{{ work.video }}" target="_blank"><video height="128" src="{{ work.video }}" poster="{{ work.poster }}" preload="none" loop="loop"></video></a>
                     <div>
                         <span style="height:20px;background-color:#ccc;">
                             <span style="position:relative;">时长： {{ work.duration }}ms</span>

@@ -74,6 +74,7 @@
 
                 material_html += '<td><a href="' + work.video + '" target="_blank"><video height="128" src="' + work.video + '"';
                 //material_html += ' autoplay="autoplay"';
+                material_html += ' preload="none"';
                 material_html += ' poster="' + work.poster + '"';
                 material_html += ' loop="loop"></video></a>';
                 material_html += '<div><span style="height:20px;background-color:#ccc;"><span style="position:relative;">时长：' + (work.duration / 1000) + 's';
@@ -142,8 +143,9 @@
                 'dataType' : 'json',
                 success : function(data) {
                     if (data.code == 0) {
-                        //$('#work_' + index).remove();
-                        search_works('1');
+                        $('#recommend_' + index).hide();
+                        $('#cancel_recommend_' + index).show();
+                        //search_works('1');
                     } else {
                         alert(data.msg);
                     }
@@ -159,7 +161,9 @@
                 'dataType' : 'json',
                 success : function(data) {
                     if (data.code == 0) {
-                        search_works('1');
+                        $('#recommend_' + index).show();
+                        $('#cancel_recommend_' + index).hide();
+                        //search_works('1');
                     } else {
                         alert(data.msg);
                     }
