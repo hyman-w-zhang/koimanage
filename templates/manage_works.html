@@ -93,13 +93,23 @@
                 material_html += '<td><div><span>' + (work.pv) + '</span></div></td>';
                 material_html += '<td><div><span>' + (work.report) + '</span></div></td>';
 
-                material_html += '<td><div><span>' + (work.status == 'enable' ? '已发布' : '审核下架') + '</span></div></td>';
+                material_html += '<td><div><span id="status_text_' + i + '">';
+                var status_text =  '已发布';
+                if (work.status == 'audit'){
+                    status_text = '审核下架';
+                } else if (work.status == 'cancel'){
+                    status_text = '取消发布';
+                } else if (work.status == 'disable'){
+                    status_text = '已删除';
+                }
+                material_html += status_text;
+                material_html += '</span></div></td>';
 
                 // actions
                 material_html += '<td><div>';
 
                 material_html += '<div id="recommend_' + i + '" style=';
-                material_html += (work.status == 'audit' ? '"display:none;"' : '"display:inline;"');
+                material_html += (work.status == 'enable' ? '"display:inline;"' : '"display:none;"');
                 material_html += '><button class="btn btn-md btn-danger" onclick="audit_work(' + i + ');">下架</div>';
                 material_html += '<div id="cancel_recommend_' + i + '" style=';
                 material_html += (work.status == 'audit' ? '"display:inline;"' : '"display:none;"');
@@ -145,6 +155,7 @@
                     if (data.code == 0) {
                         $('#recommend_' + index).hide();
                         $('#cancel_recommend_' + index).show();
+                        $('#status_text_' + index).html('审核下架');
                         //search_works('1');
                     } else {
                         alert(data.msg);
@@ -163,6 +174,7 @@
                     if (data.code == 0) {
                         $('#recommend_' + index).show();
                         $('#cancel_recommend_' + index).hide();
+                        $('#status_text_' + index).html('已发布');
                         //search_works('1');
                     } else {
                         alert(data.msg);
